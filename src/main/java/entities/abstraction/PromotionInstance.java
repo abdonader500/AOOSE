@@ -1,4 +1,4 @@
-package entities.classes;
+package entities.abstraction;
 
 public class PromotionInstance {
     private long instanceID; // Unique identifier for this promotion instance

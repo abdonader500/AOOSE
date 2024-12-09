@@ -1,4 +1,4 @@
-package entities.classes;
+package entities.abstraction;
 
 import java.util.Date;
 

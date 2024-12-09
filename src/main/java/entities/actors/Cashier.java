@@ -1,6 +1,6 @@
 package entities.actors;
 
-import entities.classes.PromotionInstance;
+import entities.abstraction.PromotionInstance;
 import enums.Shifts;
 
 import java.util.ArrayList;
