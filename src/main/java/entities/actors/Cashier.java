@@ -1,22 +1,25 @@
-package entities;
+package entities.actors;
 
+import entities.classes.PromotionInstance;
 import enums.Shifts;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Cashier extends User {
     private long pcNumber;
     private Shifts shiftSchedule;
     protected int salary;
-    private ArrayList<String> promotions; // Using String for simplicity; replace with Promotion class later
+    private List<PromotionInstance> promotionInstances; // Using String for simplicity; replace with Promotion class later
 
     // Constructor
-    public Cashier(int id, String fullName, String email, String password, long phoneNumber, long pcNumber, Shifts shiftSchedule, int salary) {
+    public Cashier(int id, String fullName, String email, String password, long phoneNumber,
+                   long pcNumber, Shifts shiftSchedule, int salary) {
         super(id, fullName, email, password, phoneNumber);
         this.pcNumber = pcNumber;
         this.shiftSchedule = shiftSchedule;
         this.salary = salary;
-        this.promotions = new ArrayList<>();
+        this.promotionInstances = new ArrayList<>();
     }
 
     // Getters and Setters
@@ -28,8 +31,8 @@ public class Cashier extends User {
         this.shiftSchedule = shiftSchedule;
     }
 
-    public void setPromotions(ArrayList<String> promotions) {
-        this.promotions = promotions;
+    public void setPromotionInstances(List<PromotionInstance> promotionInstances) {
+        this.promotionInstances = promotionInstances;
     }
 
     protected void setSalary(int salary) {
@@ -48,8 +51,8 @@ public class Cashier extends User {
         return salary;
     }
 
-    public ArrayList<String> getPromotions() {
-        return promotions;
+    public List<PromotionInstance> getPromotionInstances() {
+        return promotionInstances;
     }
 
 
@@ -84,16 +87,23 @@ public class Cashier extends User {
         // Logic for applying loyalty discounts
     }
 
-    public void addPromotion(String promotion) {
-        promotions.add(promotion);
-        System.out.println("Promotion added: " + promotion);
+    public void addPromotionInstance(PromotionInstance instance) {
+        promotionInstances.add(instance);
+        System.out.println("PromotionInstance added: " + instance.getInstanceID());
     }
 
-    public void removePromotion(String promotion) {
-        if (promotions.remove(promotion)) {
-            System.out.println("Promotion removed: " + promotion);
-        } else {
-            System.out.println("Promotion not found.");
+    public void removePromotionInstance(long instanceID) {
+        promotionInstances.removeIf(instance -> instance.getInstanceID() == instanceID);
+        System.out.println("PromotionInstance removed with ID: " + instanceID);
+    }
+
+    public void viewPromotionInstances() {
+        System.out.println("List of PromotionInstances managed by Cashier:");
+        for (PromotionInstance instance : promotionInstances) {
+            System.out.println("- ID: " + instance.getInstanceID() +
+                    ", Promotion: " + instance.getPromotionRef().getName() +
+                    ", Start Date: " + instance.getStartDate() +
+                    ", End Date: " + instance.getEndDate());
         }
     }
 

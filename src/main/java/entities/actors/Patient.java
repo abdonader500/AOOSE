@@ -1,4 +1,4 @@
-package entities;
+package entities.actors;
 
 import enums.Gender;
 import enums.PaymentStatus;

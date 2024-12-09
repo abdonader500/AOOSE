@@ -1,8 +1,8 @@
 package test;
 
-import entities.Admin;
-import entities.Cashier;
-import entities.Pharmacist;
+import entities.actors.Admin;
+import entities.actors.Cashier;
+import entities.actors.Pharmacist;
 import enums.AccessLevels;
 import enums.Shifts;
 

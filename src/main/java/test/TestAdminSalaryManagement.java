@@ -1,9 +1,8 @@
 package test;
 
-import entities.Admin;
-import entities.Cashier;
+import entities.actors.Admin;
+import entities.actors.Cashier;
 import enums.AccessLevels;
-import enums.Shifts;
 import enums.Shifts;
 
 public class TestAdminSalaryManagement {

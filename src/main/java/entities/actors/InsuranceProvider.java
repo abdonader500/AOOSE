@@ -1,4 +1,4 @@
-package entities;
+package entities.actors;
 
 public class InsuranceProvider {
     private String companyName;

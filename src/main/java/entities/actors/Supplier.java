@@ -1,4 +1,4 @@
-package entities;
+package entities.actors;
 
 public class Supplier {
     private String companyName;

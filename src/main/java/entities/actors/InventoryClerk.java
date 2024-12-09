@@ -1,4 +1,4 @@
-package entities;
+package entities.actors;
 
 import java.util.ArrayList;
 import java.util.List;
