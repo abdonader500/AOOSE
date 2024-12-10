@@ -1,51 +1,69 @@
 package entities.actors;
 
-public class InsuranceProvider {
-    private String companyName;
-    private long companyContact;
-    private String companyAddress;
+import entities.others.Insurance;
 
-    public InsuranceProvider(String companyName, long companyContact, String companyAddress) {
+import java.util.ArrayList;
+import java.util.List;
+
+public class InsuranceProvider {
+    private String termsAndConditions;
+    private String companyName;
+    private String coverageDetails;
+    private List<Insurance> insurances; // Composition: InsuranceProvider owns Insurance
+
+    // Constructor
+    public InsuranceProvider(String termsAndConditions, String companyName, String coverageDetails) {
+        this.termsAndConditions = termsAndConditions;
         this.companyName = companyName;
-        this.companyContact = companyContact;
-        this.companyAddress = companyAddress;
+        this.coverageDetails = coverageDetails;
+        this.insurances = new ArrayList<>();
     }
 
-    // setters and Setters
+
+    // setters and getters
+    public void setTermsAndConditions(String termsAndConditions) {
+        this.termsAndConditions = termsAndConditions;
+    }
+
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
     }
 
-    public void setCompanyContact(long companyContact) {
-        this.companyContact = companyContact;
+    public void setCoverageDetails(String coverageDetails) {
+        this.coverageDetails = coverageDetails;
     }
 
-    public void setCompanyAddress(String companyAddress) {
-        this.companyAddress = companyAddress;
+    public String getTermsAndConditions() {
+        return termsAndConditions;
     }
 
     public String getCompanyName() {
         return companyName;
     }
 
-    public long getCompanyContact() {
-        return companyContact;
+    public String getCoverageDetails() {
+        return coverageDetails;
     }
 
-    public String getCompanyAddress() {
-        return companyAddress;
+    public List<Insurance> getInsurances() {
+        return insurances;
     }
 
-
-    // Methods
-    public void processClaim(String claimId) {
-        System.out.println("Processing claim with ID: " + claimId);
-        // Logic to process an insurance claim
+    // Methods to manage Insurance
+    public void addInsurance(Insurance insurance) {
+        insurances.add(insurance);
+        System.out.println("Insurance added: " + insurance.getInsuranceID());
     }
 
-    public boolean verifyPatientInsurance(String patientId) {
-        System.out.println("Verifying insurance for patient with ID: " + patientId);
-        // Logic to verify a patient's insurance
-        return true; // Placeholder; replace with actual verification logic
+    public void removeInsurance(long insuranceID) {
+        insurances.removeIf(insurance -> insurance.getInsuranceID() == insuranceID);
+        System.out.println("Insurance removed: " + insuranceID);
+    }
+
+    public void displayInsurances() {
+        System.out.println("Insurance list for provider: " + companyName);
+        for (Insurance insurance : insurances) {
+            insurance.displayInsuranceDetails();
+        }
     }
 }

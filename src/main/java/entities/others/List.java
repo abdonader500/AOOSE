@@ -1,39 +1,36 @@
 package entities.others;
 
+import entities.actors.Cashier;
 import enums.ListTypes;
+import enums.Shifts;
 
-public class List {
-    private long id;
+public class List extends Cashier {
+    private long ID;
     private ListTypes listType;
 
     // Constructor
-    public List(long id, ListTypes listType) {
-        this.id = id;
+    public List(int id, String fullName, String email, String password, long phoneNumber, long pcNumber,
+                Shifts shiftSchedule, int salary, long listID, ListTypes listType) {
+        super(id, fullName, email, password, phoneNumber, pcNumber, shiftSchedule, salary); // Call Cashier constructor
+        this.ID = listID;
         this.listType = listType;
     }
 
-    // Getters and Setters
-    public long getId() {
-        return id;
-    }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public ListTypes getListType() {
-        return listType;
+    // setters and getters
+    public void setID(long ID) {
+        this.ID = ID;
     }
 
     public void setListType(ListTypes listType) {
         this.listType = listType;
     }
 
-    @Override
-    public String toString() {
-        return "List{" +
-                "id=" + id +
-                ", listType=" + listType +
-                '}';
+    public long getID() {
+        return ID;
+    }
+
+    public ListTypes getListType() {
+        return listType;
     }
 }
