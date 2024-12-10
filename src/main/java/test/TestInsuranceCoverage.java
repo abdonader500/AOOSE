@@ -45,12 +45,7 @@ public class TestInsuranceCoverage {
                 "alice.smith@example.com",
                 "password123",
                 9876543210L,
-                "123 Maple Street",
-                "Female",
-                28,
-                "1234567890",
-                "Fever",
-                "Gold"
+                "123 Maple Street"
         );
         patient1.setInsurance(insurance1);
 
@@ -60,12 +55,7 @@ public class TestInsuranceCoverage {
                 "bob.johnson@example.com",
                 "password123",
                 9876543211L,
-                "456 Oak Avenue",
-                "Male",
-                35,
-                "0987654321",
-                "Back Pain",
-                "Silver"
+                "456 Oak Avenue"
         );
         patient2.setInsurance(insurance2);
 

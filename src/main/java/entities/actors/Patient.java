@@ -13,8 +13,7 @@ public class Patient extends User {
 
     // Constructor
     public Patient(int id, String fullName, String email, String password, long phoneNumber,
-                   String address, String gender, int age, String emergencyContact,
-                   String issue, String loyaltyDiscount) {
+                   String address) {
         super(id, fullName, email, password, phoneNumber); // Call parent constructor
         this.address = address;
         this.gender = gender;

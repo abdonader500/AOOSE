@@ -2,6 +2,8 @@ package entities.actors;
 
 import java.util.ArrayList;
 import java.util.List;
+import entities.others.Order;
+import entities.abstraction.Item;  // Assuming Item is a well-defined class in the entities package
 
 public class InventoryClerk extends User {
     private int salary;
@@ -14,17 +16,14 @@ public class InventoryClerk extends User {
         this.department = department;
     }
 
-
-    // setters and getters
-
+    // Setters and Getters
     protected void setSalary(int salary) {
-        this.salary = salary; // Admin can modify salary via this setter
+        this.salary = salary;  // Admin can modify salary via this setter
     }
 
     public void setDepartment(String department) {
         this.department = department;
     }
-
 
     public int getSalary() {
         return salary;
@@ -34,38 +33,45 @@ public class InventoryClerk extends User {
         return department;
     }
 
-
-    // Methods
-    public void viewItemDetails() {
-        System.out.println("Viewing item details...");
-        // Logic to fetch and display item details
+    // Methods to manage orders
+    public Order requestOrder(int orderId) {
+        Order newOrder = new Order(orderId);  // Create a new order
+        return newOrder;
     }
 
-    public void addStock() {
-        System.out.println("Adding stock to inventory...");
-        // Logic to add stock to inventory
+    // Method to view details of an item
+    public void viewItemDetails(Item item) {
+        System.out.println("Item Details: ID - " + item.getItemID() + ", Name - " + item.getName() + ", Price - $" + item.getPrice());
     }
 
-    public void removeStock() {
-        System.out.println("Removing stock from inventory...");
-        // Logic to remove stock from inventory
+    // Stock management methods
+    public void addStock(Item item, int quantity) {
+        System.out.println("Adding " + quantity + " units of " + item.getName() + " to inventory.");
+        item.setQuantity(item.getQuantity() + quantity);  // Assuming Item has a quantity field
     }
 
-    public void updateStock() {
-        System.out.println("Updating stock in inventory...");
-        // Logic to update stock in inventory
+    public void removeStock(Item item, int quantity) {
+        System.out.println("Removing " + quantity + " units of " + item.getName() + " from inventory.");
+        item.setQuantity(item.getQuantity() - quantity);
     }
 
-    public List<String> viewStockList() {
+    public void updateStock(Item item, int quantity) {
+        System.out.println("Updating stock for " + item.getName() + " to " + quantity + " units.");
+        item.setQuantity(quantity);
+    }
+
+    // Viewing the current stock list
+    public List<Item> viewStockList() {
         System.out.println("Viewing stock list...");
-        List<String> stockList = new ArrayList<>(); // Placeholder; replace with Item objects later
-        stockList.add("Paracetamol - 50 units");
-        stockList.add("Ibuprofen - 30 units");
+        List<Item> stockList = new ArrayList<>();  // Placeholder for actual stock fetching logic
+        // Example added items
+        stockList.add(new Item(1, "Paracetamol", 0.50, 50));
+        stockList.add(new Item(2, "Ibuprofen", 1.50, 30));
         return stockList;
     }
 
-    public void notifySupplier() {
-        System.out.println("Notifying supplier about stock requirements...");
-        // Logic to notify supplier
+    public void notifySupplier(Item item, int quantity) {
+        System.out.println("Notifying supplier to restock " + quantity + " units of " + item.getName() + ".");
+        // Placeholder for actual notification logic
     }
 }

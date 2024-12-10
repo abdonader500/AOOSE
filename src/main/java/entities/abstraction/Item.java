@@ -7,14 +7,16 @@ public class Item {
     private String category;
     private double price;
     private String description;
+    private int quantity;
 
     // Constructor
-    public Item(long itemID, String name, String category, double price, String description) {
+    public Item(long itemID, String name, double price, int quantity) {
         this.itemID = itemID;
         this.name = name;
         this.category = category;
         this.price = price;
         this.description = description;
+        this.quantity = quantity;
     }
 
 
@@ -56,9 +58,12 @@ public class Item {
         return price;
     }
 
-    public String getDescription() {
-        return description;
-    }
+    public String getDescription() { return description; }
+
+    public int getQuantity() { return quantity;}
+
+
+    public void setQuantity(int quantity) { this.quantity = quantity;}
 
     // Display item details
     public void displayDetails() {
