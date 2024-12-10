@@ -1,6 +1,7 @@
 package entities.actors;
 
 import entities.abstraction.PromotionInstance;
+import entities.others.MakePayment;
 import enums.Shifts;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ public class Cashier extends User {
     private Shifts shiftSchedule;
     protected int salary;
     private List<PromotionInstance> promotionInstances; // Using String for simplicity; replace with Promotion class later
+    private MakePayment paymentStrategy;
 
     // Constructor
     public Cashier(int id, String fullName, String email, String password, long phoneNumber,
@@ -104,6 +106,21 @@ public class Cashier extends User {
                     ", Promotion: " + instance.getPromotionRef().getName() +
                     ", Start Date: " + instance.getStartDate() +
                     ", End Date: " + instance.getEndDate());
+        }
+    }
+    public MakePayment getPaymentStrategy() {
+        return paymentStrategy;
+    }
+
+    public void setPaymentStrategy(MakePayment paymentStrategy) {
+        this.paymentStrategy = paymentStrategy;
+    }
+
+    public void executePayment() {
+        if (paymentStrategy != null) {
+            paymentStrategy.processPayment();
+        } else {
+            System.out.println("No payment method set for this cashier.");
         }
     }
 
