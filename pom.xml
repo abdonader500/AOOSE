@@ -9,10 +9,11 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>20</maven.compiler.source>
-        <maven.compiler.target>20</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source> <!-- Using LTS Java 17 -->
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
     <dependencies>
         <!-- MongoDB Driver -->
         <dependency>
@@ -20,13 +21,67 @@
             <artifactId>mongodb-driver-sync</artifactId>
             <version>4.10.0</version>
         </dependency>
+
+        <!-- JUnit for Testing -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.9.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.9.3</version>
             <scope>test</scope>
         </dependency>
 
+        <!-- SLF4J for Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.36</version>
+        </dependency>
+
+        <!-- Embedded MongoDB for Testing -->
+        <dependency>
+            <groupId>de.flapdoodle.embed</groupId>
+            <artifactId>de.flapdoodle.embed.mongo</artifactId>
+            <version>3.2.4</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Testcontainers for Reliable Testing -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>mongodb</artifactId>
+            <version>1.17.6</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <!-- Compiler Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.1</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+
+            <!-- Surefire Plugin for Testing -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M5</version>
+                <configuration>
+                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
