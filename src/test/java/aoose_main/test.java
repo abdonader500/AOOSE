@@ -6,11 +6,12 @@ import aoose_main.entities.actors.Supplier;
 import aoose_main.entities.others.Order;
 import aoose_main.enums.OrderStatus;
 import aoose_main.connection.MongoDBConnection;
+import aoose_main.remotePattern.InventoryDTO;
 import com.mongodb.client.MongoDatabase;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,43 +29,45 @@ public class test {
 
     @Test
     public void testSupplierCreatesOrderAndInventoryClerkProcessesIt() {
-        // Supplier registers an order
         Supplier supplier = new Supplier("Health Supplies Co.", 1234567890L, "123 Supplier Lane");
         Item item1 = new Item(1, "Paracetamol", "Pain reliever", 2.5, "Tablet", 100);
         Item item2 = new Item(2, "Ibuprofen", "Anti-inflammatory", 3.0, "Capsule", 50);
-        List<Item> items = Arrays.asList(item1, item2);
 
-        Order order = supplier.registerOrder(1, items);
-        Order order1 = supplier.registerOrder(3, items);
+        // Supplier registers an order
+        Order order = supplier.registerOrder(1, List.of(item1, item2));
 
-        // Display order details created by the supplier
-        System.out.println("Order created by supplier:");
-        System.out.println("Order ID: " + order.getOrderID());
-        for (Item item : order.getItems()) {
-            System.out.println("Item: " + item.getName() + ", Quantity: " + item.getQuantity() + ", Price: $" + item.getPrice());
-        }
-        System.out.println("Status: " + order.getStatus());
-
-        // InventoryClerk processes the order
+        // Set up InventoryClerk and inventory list
         InventoryClerk inventoryClerk = new InventoryClerk(1, "John Doe", "johndoe@example.com", "password123", 1234567890L, 5000, "Inventory");
-        Order loadedOrder = inventoryClerk.requestOrder(1);
+        List<InventoryDTO> inventory = new ArrayList<>();
+        InventoryDAO inventoryDAO = new InventoryDAO(database);
 
-        assertNotNull(loadedOrder, "Order should be loaded from the database.");
-        assertEquals(OrderStatus.Pending, loadedOrder.getStatus(), "Order status should initially be Pending.");
+        // Approve order and add items to inventory
+        inventoryClerk.approveOrder(1, inventory,inventoryDAO);
 
-        inventoryClerk.approveOrder(1);
+        // Verify inventory contains the approved items
+        for (InventoryDTO inventoryItem : inventory) {
+            String itemName = inventoryItem.getItemName();
+            double price = inventoryItem.getPrice();
+            int quantity = inventoryItem.getQuantity(); // Already cast to int in DTO
 
-        // Reload the order to verify the status change
-        Order approvedOrder = Order.loadFromDatabase(1);
-        assertNotNull(approvedOrder, "Approved order should be loaded from the database.");
-        assertEquals(OrderStatus.Received, approvedOrder.getStatus(), "Order status should be updated to Received.");
-
-        // Display updated order details after processing
-        System.out.println("Order after Inventory Clerk confirmation:");
-        System.out.println("Order ID: " + approvedOrder.getOrderID());
-        for (Item item : approvedOrder.getItems()) {
-            System.out.println("Item: " + item.getName() + ", Quantity: " + item.getQuantity() + ", Price: $" + item.getPrice());
+            System.out.println("Inventory Item: " + itemName + ", Quantity: " + quantity + ", Price: " + price);
         }
-        System.out.println("Status: " + approvedOrder.getStatus());
+
+        // Assert inventory size and content
+        assertEquals(2, inventory.size(), "Inventory should have 2 items.");
+
+        // Verify Paracetamol
+        InventoryDTO dbItem = inventoryDAO.getItemByName("Paracetamol");
+        assertNotNull(dbItem, "Paracetamol should be in the inventory.");
+        assertEquals("Paracetamol", dbItem.getItemName(), "Paracetamol name should match.");
+        assertEquals(100, dbItem.getQuantity(), "Paracetamol quantity should be 100.");
+        assertEquals(2.5, dbItem.getPrice(), "Paracetamol price should be 2.5.");
+
+        // Verify Ibuprofen
+        InventoryDTO dbItem2 = inventoryDAO.getItemByName("Ibuprofen");
+        assertNotNull(dbItem2, "Ibuprofen should be in the inventory.");
+        assertEquals("Ibuprofen", dbItem2.getItemName(), "Ibuprofen name should match.");
+        assertEquals(50, dbItem2.getQuantity(), "Ibuprofen quantity should be 50.");
+        assertEquals(3.0, dbItem2.getPrice(), "Ibuprofen price should be 3.0.");
     }
 }

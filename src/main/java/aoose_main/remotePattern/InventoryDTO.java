@@ -3,24 +3,34 @@ package aoose_main.remotePattern;
 import java.io.Serializable;
 
 public class InventoryDTO implements Serializable {
-    private static final long serialVersionUID = 1L;  // Control the version
+    private static final long serialVersionUID = 1L;
 
-    private final int itemId;
+    private final int itemID;  // Add itemID
     private final String itemName;
     private final double price;
     private final int quantity;
 
     // Constructor
-    public InventoryDTO(int itemId, String itemName, double price, int quantity) {
-        this.itemId = itemId;
+    public InventoryDTO(int itemID, String itemName, double price, int quantity) {
+        if (itemName == null || itemName.isEmpty()) {
+            throw new IllegalArgumentException("Item name cannot be null or empty.");
+        }
+        if (price < 0) {
+            throw new IllegalArgumentException("Price cannot be negative.");
+        }
+        if (quantity < 0) {
+            throw new IllegalArgumentException("Quantity cannot be negative.");
+        }
+
+        this.itemID = itemID;
         this.itemName = itemName;
         this.price = price;
         this.quantity = quantity;
     }
 
-    // Getters only for immutability
-    public int getItemId() {
-        return itemId;
+    // Getters
+    public int getItemID() {
+        return itemID;
     }
 
     public String getItemName() {
@@ -33,5 +43,15 @@ public class InventoryDTO implements Serializable {
 
     public int getQuantity() {
         return quantity;
+    }
+
+    @Override
+    public String toString() {
+        return "InventoryDTO{" +
+                "itemID=" + itemID +
+                ", itemName='" + itemName + '\'' +
+                ", price=" + price +
+                ", quantity=" + quantity +
+                '}';
     }
 }

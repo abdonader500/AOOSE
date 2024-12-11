@@ -2,6 +2,7 @@ package aoose_main.entities.others;
 
 import aoose_main.entities.abstraction.Item;
 import aoose_main.enums.OrderStatus;
+import aoose_main.remotePattern.InventoryDTO;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
@@ -83,6 +84,42 @@ public class Order {
         } else {
             ordersCollection.updateOne(eq("orderID", orderID), new Document("$set", orderDoc));
             System.out.println("Order updated in database.");
+        }
+    }
+
+    // Approve and add items to inventory
+    public void approveAndAddToInventory(List<InventoryDTO> inventoryItems) {
+        if (this.status != OrderStatus.Pending) {
+            System.out.println("Order is not in a pending state. Cannot approve.");
+            return;
+        }
+
+        // Convert items to InventoryDTO and add them to the inventory list
+        for (Item item : items) {
+            InventoryDTO inventoryDTO = new InventoryDTO(
+                    (int) item.getItemID(),  // Ensure item ID is passed
+                    item.getName(),
+                    item.getPrice(),
+                    item.getQuantity()
+            );
+            inventoryItems.add(inventoryDTO);
+            System.out.println("Item added to inventory: " + inventoryDTO.getItemName());
+        }
+
+        // Update the order status and save to the database
+        this.status = OrderStatus.Received;
+        saveToDatabase();
+        System.out.println("Order approved and items added to inventory.");
+    }
+
+    // Reject the order
+    public void rejectOrder() {
+        if (this.status == OrderStatus.Pending) {
+            this.status = OrderStatus.Rejected;
+            saveToDatabase();
+            System.out.println("Order with ID " + orderID + " rejected.");
+        } else {
+            System.out.println("Order is not in a pending state. Cannot reject.");
         }
     }
 

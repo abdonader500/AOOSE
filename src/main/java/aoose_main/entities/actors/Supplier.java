@@ -3,7 +3,9 @@ package aoose_main.entities.actors;
 import aoose_main.entities.abstraction.Item;
 import aoose_main.entities.others.Order;
 import aoose_main.enums.OrderStatus;
+import aoose_main.remotePattern.InventoryDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Supplier {
@@ -46,6 +48,8 @@ public class Supplier {
     // Method to register a new order
     public Order registerOrder(int orderID, List<Item> items) {
         Order newOrder = new Order(orderID, OrderStatus.Pending); // Default status is Pending
+
+        // Associate items with the order directly
         newOrder.setItems(items);
         newOrder.saveToDatabase();
         System.out.println("Order registered by supplier: " + companyName);

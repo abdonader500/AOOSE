@@ -1,10 +1,13 @@
 package aoose_main.entities.actors;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import aoose_main.InventoryDAO;
 import aoose_main.entities.abstraction.Item;
 import aoose_main.entities.others.Order;
 import aoose_main.enums.OrderStatus;
+import aoose_main.remotePattern.InventoryDTO;
 
 public class InventoryClerk extends User {
     private int salary;
@@ -43,23 +46,42 @@ public class InventoryClerk extends User {
         return order;
     }
 
-    // Approve an order
-    public void approveOrder(int orderId) {
+    // Approve an order and add items to inventory
+    public void approveOrder(int orderId, List<InventoryDTO> inventory, InventoryDAO inventoryDAO) {
         Order order = requestOrder(orderId);
-        if (order != null) {
+        if (order != null && order.getStatus() == OrderStatus.Pending) {
+            // Update the order status to Received
             order.setStatus(OrderStatus.Received);
             order.saveToDatabase();
             System.out.println("Order with ID " + orderId + " approved and marked as Received.");
+
+            // Add the items from the order to the inventory and save to the database
+            for (Item item : order.getItems()) {
+                InventoryDTO inventoryItem = new InventoryDTO(
+                        (int) item.getItemID(),
+                        item.getName(),
+                        item.getPrice(),
+                        item.getQuantity()
+                );
+                inventory.add(inventoryItem);  // Add to in-memory list
+                inventoryDAO.createItem(inventoryItem);  // Persist in the database
+                System.out.println("Added to inventory: " + inventoryItem.getItemName());
+            }
+        } else {
+            System.out.println("Order with ID " + orderId + " cannot be approved.");
         }
     }
+
 
     // Reject an order
     public void rejectOrder(int orderId) {
         Order order = requestOrder(orderId);
-        if (order != null) {
+        if (order != null && order.getStatus() == OrderStatus.Pending) {
             order.setStatus(OrderStatus.Rejected);
             order.saveToDatabase();
             System.out.println("Order with ID " + orderId + " rejected.");
+        } else {
+            System.out.println("Order with ID " + orderId + " cannot be rejected (not pending).");
         }
     }
 
