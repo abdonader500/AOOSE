@@ -1,7 +1,7 @@
 package aoose_main;
 
 import com.mongodb.client.MongoDatabase;
-import connection.MongoDBConnection;
+import aoose_main.connection.MongoDBConnection;
 
 public class Main {
     public static void main(String[] args) {
