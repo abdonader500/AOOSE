@@ -1,6 +1,6 @@
 package aoose_main.services;
 
-import aoose_main.dao.InventoryDAO;
+import aoose_main.InventoryDAO;
 import aoose_main.remotePattern.InventoryDTO;
 
 import java.util.List;

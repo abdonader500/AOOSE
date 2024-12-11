@@ -1,5 +1,11 @@
 package aoose_main.entities.actors;
 
+import aoose_main.entities.abstraction.Item;
+import aoose_main.entities.others.Order;
+import aoose_main.enums.OrderStatus;
+
+import java.util.List;
+
 public class Supplier {
     private String companyName;
     private long supplierContact;
@@ -12,50 +18,44 @@ public class Supplier {
         this.companyAddress = companyAddress;
     }
 
-    // setters and getters
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
-    }
-
-    public void setSupplierContact(long supplierContact) {
-        this.supplierContact = supplierContact;
-    }
-
-    public void setCompanyAddress(String companyAddress) {
-        this.companyAddress = companyAddress;
-    }
-
+    // Setters and Getters
     public String getCompanyName() {
         return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 
     public long getSupplierContact() {
         return supplierContact;
     }
 
+    public void setSupplierContact(long supplierContact) {
+        this.supplierContact = supplierContact;
+    }
+
     public String getCompanyAddress() {
         return companyAddress;
     }
 
-
-    // Methods
-    public void deliverItems() {
-        System.out.println("Delivering items to the inventory...");
-        // Logic for delivering items
+    public void setCompanyAddress(String companyAddress) {
+        this.companyAddress = companyAddress;
     }
 
-    public void addItems() {
-        System.out.println("Adding items to the inventory...");
-        // Logic for adding items
+    // Method to register a new order
+    public Order registerOrder(int orderID, List<Item> items) {
+        Order newOrder = new Order(orderID, OrderStatus.Pending); // Default status is Pending
+        newOrder.setItems(items);
+        newOrder.saveToDatabase();
+        System.out.println("Order registered by supplier: " + companyName);
+        return newOrder;
     }
 
-    public void updateItems() {
-        System.out.println("Updating items in the inventory...");
-        // Logic for updating items
-    }
-
-    public void removeItems() {
-        System.out.println("Removing items from the inventory...");
-        // Logic for removing items
+    // Method to update stock information
+    public void updateAvailableStock(Order order, OrderStatus status) {
+        order.setStatus(status); // Update the order status (e.g., Received, Rejected)
+        order.saveToDatabase();
+        System.out.println("Order status updated to: " + status.name());
     }
 }

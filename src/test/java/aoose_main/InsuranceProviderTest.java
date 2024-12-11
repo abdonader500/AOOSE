@@ -1,4 +1,4 @@
-package aoose_main.dao;
+package aoose_main;
 
 import aoose_main.connection.MongoDBConnection;
 import aoose_main.entities.actors.InsuranceProvider;

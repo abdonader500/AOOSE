@@ -1,4 +1,4 @@
-package aoose_main.dao;
+package aoose_main;
 
 import aoose_main.remotePattern.InventoryDTO;
 import com.mongodb.client.MongoCollection;

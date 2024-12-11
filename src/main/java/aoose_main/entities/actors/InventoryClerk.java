@@ -1,10 +1,10 @@
 package aoose_main.entities.actors;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import aoose_main.entities.abstraction.Item;
 import aoose_main.entities.others.Order;
-import aoose_main.entities.abstraction.Item;  // Assuming Item is a well-defined class in the entities package
+import aoose_main.enums.OrderStatus;
 
 public class InventoryClerk extends User {
     private int salary;
@@ -19,7 +19,7 @@ public class InventoryClerk extends User {
 
     // Setters and Getters
     protected void setSalary(int salary) {
-        this.salary = salary;  // Admin can modify salary via this setter
+        this.salary = salary;
     }
 
     public void setDepartment(String department) {
@@ -34,47 +34,46 @@ public class InventoryClerk extends User {
         return department;
     }
 
-    // Methods to manage orders
+    // Load an order by ID
     public Order requestOrder(int orderId) {
-        Order newOrder = new Order(orderId);  // Create a new order
-        return newOrder;
+        Order order = Order.loadFromDatabase(orderId);
+        if (order == null) {
+            System.out.println("Order with ID " + orderId + " not found.");
+        }
+        return order;
     }
 
-    // Method to view details of an item
-    public void viewItemDetails(Item item) {
-        System.out.println("Item Details: ID - " + item.getItemID() + ", Name - " + item.getName() + ", Price - $" + item.getPrice());
+    // Approve an order
+    public void approveOrder(int orderId) {
+        Order order = requestOrder(orderId);
+        if (order != null) {
+            order.setStatus(OrderStatus.Received);
+            order.saveToDatabase();
+            System.out.println("Order with ID " + orderId + " approved and marked as Received.");
+        }
     }
 
-    // Stock management methods
-    public void addStock(Item item, int quantity) {
-        System.out.println("Adding " + quantity + " units of " + item.getName() + " to inventory.");
-        item.setQuantity(item.getQuantity() + quantity);  // Assuming Item has a quantity field
+    // Reject an order
+    public void rejectOrder(int orderId) {
+        Order order = requestOrder(orderId);
+        if (order != null) {
+            order.setStatus(OrderStatus.Rejected);
+            order.saveToDatabase();
+            System.out.println("Order with ID " + orderId + " rejected.");
+        }
     }
 
-    public void removeStock(Item item, int quantity) {
-        System.out.println("Removing " + quantity + " units of " + item.getName() + " from inventory.");
-        item.setQuantity(item.getQuantity() - quantity);
-    }
-
-    public void updateStock(Item item, int quantity) {
-        System.out.println("Updating stock for " + item.getName() + " to " + quantity + " units.");
-        item.setQuantity(quantity);
-    }
-
-    // Viewing the current stock list
-// Viewing the current stock list
-    public List<Item> viewStockList() {
-        System.out.println("Viewing stock list...");
-        List<Item> stockList = new ArrayList<>();  // Placeholder for actual stock fetching logic
-        // Example added items with full constructor parameters
-        stockList.add(new Item(1, "Paracetamol", "Medication", 0.50, "Pain reliever", 50));
-        stockList.add(new Item(2, "Ibuprofen", "Medication", 1.50, "Anti-inflammatory", 30));
-        return stockList;
-    }
-
-
-    public void notifySupplier(Item item, int quantity) {
-        System.out.println("Notifying supplier to restock " + quantity + " units of " + item.getName() + ".");
-        // Placeholder for actual notification logic
+    // View details of an order
+    public void viewOrderDetails(int orderId) {
+        Order order = requestOrder(orderId);
+        if (order != null) {
+            System.out.println("Order Details:");
+            System.out.println("Order ID: " + order.getOrderID());
+            System.out.println("Order Status: " + order.getStatus());
+            System.out.println("Items:");
+            for (Item item : order.getItems()) {
+                System.out.println(" - " + item.getName() + ", Quantity: " + item.getQuantity() + ", Price: $" + item.getPrice());
+            }
+        }
     }
 }
