@@ -1,5 +1,6 @@
 package entities.abstraction;
 
+import entities.remotePattern.InventoryDTO;
 
 public class Item {
     private long itemID;
@@ -10,7 +11,7 @@ public class Item {
     private int quantity;
 
     // Constructor
-    public Item(long itemID, String name, double price, int quantity) {
+    public Item(long itemID, String name, String category, double price, String description, int quantity) {
         this.itemID = itemID;
         this.name = name;
         this.category = category;
@@ -19,9 +20,7 @@ public class Item {
         this.quantity = quantity;
     }
 
-
-    // setters and getters
-
+    // Setters
     public void setItemID(long itemID) {
         this.itemID = itemID;
     }
@@ -42,6 +41,11 @@ public class Item {
         this.description = description;
     }
 
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    // Getters
     public long getItemID() {
         return itemID;
     }
@@ -58,12 +62,18 @@ public class Item {
         return price;
     }
 
-    public String getDescription() { return description; }
+    public String getDescription() {
+        return description;
+    }
 
-    public int getQuantity() { return quantity;}
+    public int getQuantity() {
+        return quantity;
+    }
 
-
-    public void setQuantity(int quantity) { this.quantity = quantity;}
+    // Method to convert this Item into an InventoryDTO
+    public InventoryDTO toInventoryDTO() {
+        return new InventoryDTO((int)itemID, name, price, quantity); // Casting long to int, ensure ids fit int type or change DTO to use long
+    }
 
     // Display item details
     public void displayDetails() {
@@ -72,5 +82,6 @@ public class Item {
         System.out.println("Category: " + category);
         System.out.println("Price: $" + price);
         System.out.println("Description: " + description);
+        System.out.println("Quantity: " + quantity);
     }
 }
