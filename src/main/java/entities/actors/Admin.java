@@ -1,7 +1,7 @@
 package entities.actors;
 
 import enums.AccessLevels;
-
+import entities.others.Report;
 public class Admin extends User {
     private int salary;
     private AccessLevels accessLevel;

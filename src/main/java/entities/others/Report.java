@@ -5,7 +5,8 @@ import enums.ReportType;
 
 public class Report extends Admin {
     // Attributes specific to Report
-    private long ID; // Unique identifier for the report
+    private long ID;
+    private String text;
     private ReportType reportType; // Type of the report
 
     // Constructor
@@ -26,6 +27,10 @@ public class Report extends Admin {
         this.reportType = reportType;
     }
 
+    public void setText(String text) {
+        this.text = text;
+    }
+
     public long getID() {
         return ID;
     }
@@ -33,6 +38,8 @@ public class Report extends Admin {
     public ReportType getReportType() {
         return reportType;
     }
+
+    public String getText() {return text;}
 
     // Method to generate the report
     public void generate() {
