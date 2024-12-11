@@ -2,6 +2,7 @@ package entities.actors;
 
 import entities.abstraction.PromotionInstance;
 import entities.others.MakePayment;
+import entities.abstraction.Item;
 import enums.Shifts;
 
 import java.util.ArrayList;
@@ -33,9 +34,7 @@ public class Cashier extends User {
         this.shiftSchedule = shiftSchedule;
     }
 
-    public void setPromotionInstances(List<PromotionInstance> promotionInstances) {
-        this.promotionInstances = promotionInstances;
-    }
+    public void setPromotionInstances(List<PromotionInstance> promotionInstances) { this.promotionInstances = promotionInstances;}
 
     protected void setSalary(int salary) {
         this.salary = salary;
@@ -59,20 +58,6 @@ public class Cashier extends User {
 
 
     // Methods
-    public void addStock() {
-        System.out.println("Stock added to inventory.");
-        // Logic for adding stock to inventory
-    }
-
-    public void updateStock() {
-        System.out.println("Stock updated in inventory.");
-        // Logic for updating stock in inventory
-    }
-
-    public void removeStock() {
-        System.out.println("Stock removed from inventory.");
-        // Logic for removing stock from inventory
-    }
 
     public void markAsDrug() {
         System.out.println("Item marked as a drug.");

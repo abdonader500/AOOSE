@@ -64,9 +64,9 @@ public class InventoryClerk extends User {
     public List<Item> viewStockList() {
         System.out.println("Viewing stock list...");
         List<Item> stockList = new ArrayList<>();  // Placeholder for actual stock fetching logic
-        // Example added items with full constructor parameters
-        stockList.add(new Item(1, "Paracetamol", "Medication", 0.50, "Pain reliever", 50));
-        stockList.add(new Item(2, "Ibuprofen", "Medication", 1.50, "Anti-inflammatory", 30));
+        // Example added items
+        stockList.add(new Item(1, "Paracetamol", 0.50, 50));
+        stockList.add(new Item(2, "Ibuprofen", 1.50, 30));
         return stockList;
     }
 
