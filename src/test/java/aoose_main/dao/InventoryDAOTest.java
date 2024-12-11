@@ -1,72 +1,107 @@
 package aoose_main.dao;
 
-import aoose_main.dao.InventoryDAO;
-import aoose_main.remotePattern.InventoryDTO;
-import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import de.flapdoodle.embed.mongo.MongodExecutable;
-import de.flapdoodle.embed.mongo.MongodStarter;
-import de.flapdoodle.embed.mongo.config.ImmutableMongodConfig;
-import de.flapdoodle.embed.mongo.config.MongoCmdOptions;
-import de.flapdoodle.embed.mongo.config.Net;
-import de.flapdoodle.embed.mongo.distribution.Version;
-import de.flapdoodle.embed.process.runtime.Network;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.MongoDBContainer;
+import org.bson.Document;
+import org.junit.jupiter.api.*;
+import aoose_main.connection.MongoDBConnection;
 
-import java.io.IOException;
-
-import static com.mongodb.client.model.Filters.eq;
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class InventoryDAOTest {
-    private static MongoDBContainer mongoDBContainer;
-    private static InventoryDAO inventoryDAO;
+
+    private MongoDatabase database;
+    private MongoCollection<Document> collection;
+    private final String collectionName = "medications";
 
     @BeforeAll
-    static void setUp() {
-        String username = "abdonader500";
-        String password = "AbdoNader%40183099"; // URL-encoded password
-        String connectionString = String.format("mongodb://%s:%s@localhost:27017/?authSource=admin", username, password);
-
-        MongoDatabase database = MongoClients.create(connectionString).getDatabase("testInventoryDB");
-        inventoryDAO = new InventoryDAO(database);
-    }
-
-
-
-
-
-    @AfterAll
-    static void tearDown() {
-        if (mongoDBContainer != null) {
-            mongoDBContainer.stop();
+    public void setup() {
+        // Connect to the MongoDB database
+        database = MongoDBConnection.connect("pharmacy");
+        collection = database.getCollection(collectionName);
+        if (collection == null) {
+            database.createCollection(collectionName);
+            collection = database.getCollection(collectionName);
         }
     }
 
-    @Test
-    void testCreateAndFetchItem() {
-        InventoryDTO newItem = new InventoryDTO(1, "TestItem", 100.0, 10);
-        inventoryDAO.createItem(newItem);
-
-        InventoryDTO fetchedItem = inventoryDAO.getItemById(1);
-        assertNotNull(fetchedItem);
-        assertEquals("TestItem", fetchedItem.getItemName());
-        assertEquals(100.0, fetchedItem.getPrice());
-        assertEquals(10, fetchedItem.getQuantity());
+    @BeforeEach
+    public void cleanCollection() {
+        // Clear the collection before each test
+        collection.deleteMany(new Document());
     }
 
     @Test
-    void testUpdateAndDeleteItem() {
-        InventoryDTO updatedItem = new InventoryDTO(1, "UpdatedItem", 150.0, 5);
-        inventoryDAO.updateItem(updatedItem);
+    public void testCreateItem() {
+        // Arrange
+        Document item = new Document("name", "Ibuprofen")
+                .append("category", "Pain Reliever")
+                .append("price", 10.99)
+                .append("stock", 50);
 
-        InventoryDTO fetchedUpdatedItem = inventoryDAO.getItemById(1);
-        assertEquals("UpdatedItem", fetchedUpdatedItem.getItemName());
+        // Act
+        collection.insertOne(item);
 
-        inventoryDAO.deleteItem(1);
-        assertNull(inventoryDAO.getItemById(1));
+        // Assert
+        Document retrievedItem = collection.find(new Document("name", "Ibuprofen")).first();
+        assertNotNull(retrievedItem);
+        assertEquals("Ibuprofen", retrievedItem.getString("name"));
+        assertEquals("Pain Reliever", retrievedItem.getString("category"));
+        assertEquals(10.99, retrievedItem.getDouble("price"));
+        assertEquals(50, retrievedItem.getInteger("stock"));
+    }
+
+    @Test
+    public void testReadItem() {
+        // Arrange
+        Document item = new Document("name", "Aspirin")
+                .append("category", "Pain Reliever")
+                .append("price", 5.99)
+                .append("stock", 30);
+        collection.insertOne(item);
+
+        // Act
+        Document retrievedItem = collection.find(new Document("name", "Aspirin")).first();
+
+        // Assert
+        assertNotNull(retrievedItem);
+        assertEquals("Aspirin", retrievedItem.getString("name"));
+    }
+
+    @Test
+    public void testUpdateItem() {
+        // Arrange
+        Document item = new Document("name", "Cough Syrup")
+                .append("category", "Cold Medicine")
+                .append("price", 15.99)
+                .append("stock", 20);
+        collection.insertOne(item);
+
+        // Act
+        collection.updateOne(new Document("name", "Cough Syrup"),
+                new Document("$set", new Document("price", 17.99)));
+
+        // Assert
+        Document updatedItem = collection.find(new Document("name", "Cough Syrup")).first();
+        assertNotNull(updatedItem);
+        assertEquals(17.99, updatedItem.getDouble("price"));
+    }
+
+    @Test
+    public void testDeleteItem() {
+        // Arrange
+        Document item = new Document("name", "Vitamin C")
+                .append("category", "Supplements")
+                .append("price", 8.99)
+                .append("stock", 100);
+        collection.insertOne(item);
+
+        // Act
+        collection.deleteOne(new Document("name", "Vitamin C"));
+
+        // Assert
+        Document deletedItem = collection.find(new Document("name", "Vitamin C")).first();
+        assertNull(deletedItem);
     }
 }
