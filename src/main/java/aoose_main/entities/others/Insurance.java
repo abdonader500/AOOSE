@@ -1,5 +1,10 @@
 package aoose_main.entities.others;
 
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class Insurance {
@@ -14,12 +19,61 @@ public class Insurance {
                      int insurancePercentage, long patientID) {
         this.insuranceProviderID = insuranceProviderID;
         this.insuranceID = insuranceID;
-        this.insuranceTier = insuranceTier;
+        this.insuranceTier = new ArrayList<>(insuranceTier); // Ensure a deep copy if mutable
         this.insurancePercentage = insurancePercentage;
         this.patientID = patientID;
     }
 
-    // setters and getters
+    // Method to create an Insurance object from a MongoDB Document
+    public static Insurance fromDocument(Document insuranceDoc) {
+        if (insuranceDoc == null) {
+            return null;
+        }
+
+        long insuranceProviderID = insuranceDoc.getLong("insuranceProviderID");
+        long insuranceID = insuranceDoc.getLong("insuranceID");
+        int insurancePercentage = insuranceDoc.getInteger("insurancePercentage", 0); // Providing a default value
+        long patientID = insuranceDoc.getLong("patientID");
+
+        // Recreate insurance tiers if they exist
+        List<Document> tierDocs = insuranceDoc.getList("insuranceTier", Document.class);
+        List<Insurance> insuranceTier = new ArrayList<>();
+        if (tierDocs != null) {
+            for (Document tierDoc : tierDocs) {
+                insuranceTier.add(Insurance.fromDocument(tierDoc));
+            }
+        }
+
+        return new Insurance(insuranceProviderID, insuranceID, insuranceTier, insurancePercentage, patientID);
+    }
+
+    // Method to convert an Insurance object to a MongoDB Document
+    public Document toDocument() {
+        Document doc = new Document()
+                .append("insuranceProviderID", insuranceProviderID)
+                .append("insuranceID", insuranceID)
+                .append("insurancePercentage", insurancePercentage)
+                .append("patientID", patientID);
+
+        // Convert insurance tiers to documents if they exist
+        if (insuranceTier != null && !insuranceTier.isEmpty()) {
+            List<Document> tierDocs = new ArrayList<>();
+            for (Insurance tier : insuranceTier) {
+                tierDocs.add(tier.toDocument());
+            }
+            doc.append("insuranceTier", tierDocs);
+        }
+
+        return doc;
+    }
+
+    // Send form method to interact with the database
+    public void sendForm(MongoDatabase database) {
+        MongoCollection<Document> collection = database.getCollection("insuranceForms");
+        collection.insertOne(this.toDocument());
+    }
+
+    // Getters and Setters
     public long getInsuranceProviderID() {
         return insuranceProviderID;
     }
@@ -37,11 +91,11 @@ public class Insurance {
     }
 
     public List<Insurance> getInsuranceTier() {
-        return insuranceTier;
+        return new ArrayList<>(insuranceTier);
     }
 
     public void setInsuranceTier(List<Insurance> insuranceTier) {
-        this.insuranceTier = insuranceTier;
+        this.insuranceTier = new ArrayList<>(insuranceTier);
     }
 
     public int getInsurancePercentage() {

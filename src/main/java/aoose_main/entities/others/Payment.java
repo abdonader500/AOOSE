@@ -1,5 +1,4 @@
 package aoose_main.entities.others;
-
 import aoose_main.entities.actors.Patient;
 
 public class Payment {
