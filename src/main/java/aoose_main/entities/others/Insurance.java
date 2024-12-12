@@ -19,9 +19,14 @@ public class Insurance {
                      int insurancePercentage, long patientID) {
         this.insuranceProviderID = insuranceProviderID;
         this.insuranceID = insuranceID;
-        this.insuranceTier = new ArrayList<>(insuranceTier); // Ensure a deep copy if mutable
+        this.insuranceTier = (insuranceTier != null) ? new ArrayList<>(insuranceTier) : new ArrayList<>();
         this.insurancePercentage = insurancePercentage;
         this.patientID = patientID;
+    }
+
+    // Overloaded Constructor (for simpler creation)
+    public Insurance(long insuranceProviderID, long insuranceID, int insurancePercentage, long patientID) {
+        this(insuranceProviderID, insuranceID, null, insurancePercentage, patientID);
     }
 
     // Method to create an Insurance object from a MongoDB Document
@@ -40,7 +45,10 @@ public class Insurance {
         List<Insurance> insuranceTier = new ArrayList<>();
         if (tierDocs != null) {
             for (Document tierDoc : tierDocs) {
-                insuranceTier.add(Insurance.fromDocument(tierDoc));
+                Insurance tier = Insurance.fromDocument(tierDoc);
+                if (tier != null) {
+                    insuranceTier.add(tier);
+                }
             }
         }
 
@@ -69,8 +77,13 @@ public class Insurance {
 
     // Send form method to interact with the database
     public void sendForm(MongoDatabase database) {
+        if (database == null) {
+            throw new IllegalArgumentException("Database connection cannot be null.");
+        }
+
         MongoCollection<Document> collection = database.getCollection("insuranceForms");
         collection.insertOne(this.toDocument());
+        System.out.println("Insurance form submitted for insurance ID: " + insuranceID);
     }
 
     // Getters and Setters
@@ -91,11 +104,11 @@ public class Insurance {
     }
 
     public List<Insurance> getInsuranceTier() {
-        return new ArrayList<>(insuranceTier);
+        return (insuranceTier != null) ? new ArrayList<>(insuranceTier) : new ArrayList<>();
     }
 
     public void setInsuranceTier(List<Insurance> insuranceTier) {
-        this.insuranceTier = new ArrayList<>(insuranceTier);
+        this.insuranceTier = (insuranceTier != null) ? new ArrayList<>(insuranceTier) : new ArrayList<>();
     }
 
     public int getInsurancePercentage() {
@@ -103,6 +116,9 @@ public class Insurance {
     }
 
     public void setInsurancePercentage(int insurancePercentage) {
+        if (insurancePercentage < 0 || insurancePercentage > 100) {
+            throw new IllegalArgumentException("Insurance percentage must be between 0 and 100.");
+        }
         this.insurancePercentage = insurancePercentage;
     }
 
@@ -116,6 +132,9 @@ public class Insurance {
 
     // Method to calculate coverage based on insurance percentage
     public double calculateCoverage(double totalBill) {
+        if (totalBill < 0) {
+            throw new IllegalArgumentException("Total bill cannot be negative.");
+        }
         return totalBill * (insurancePercentage / 100.0);
     }
 
@@ -130,6 +149,8 @@ public class Insurance {
             for (Insurance tier : insuranceTier) {
                 System.out.println("- Tier Insurance ID: " + tier.getInsuranceID());
             }
+        } else {
+            System.out.println("No insurance tiers available.");
         }
     }
 }

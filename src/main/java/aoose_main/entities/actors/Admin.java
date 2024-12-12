@@ -1,6 +1,11 @@
 package aoose_main.entities.actors;
 
 import aoose_main.enums.AccessLevels;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+
+import static com.mongodb.client.model.Filters.eq;
 
 public class Admin extends User {
     private int salary;
@@ -8,16 +13,15 @@ public class Admin extends User {
 
     // Constructor
     public Admin(int id, String fullName, String email, String password, long phoneNumber, int salary, AccessLevels accessLevel) {
-        super(id, fullName, email, password, phoneNumber); // Call the parent constructor
+        super(id, fullName, email, password, phoneNumber);
         this.salary = salary;
         this.accessLevel = accessLevel;
     }
 
-    // setters and getters
-
-     public void setSalary(int salary) {
-            this.salary = salary;
-        }
+    // Setters and Getters
+    public void setSalary(int salary) {
+        this.salary = salary;
+    }
 
     public void setAccessLevel(AccessLevels accessLevel) {
         this.accessLevel = accessLevel;
@@ -31,54 +35,127 @@ public class Admin extends User {
         return accessLevel;
     }
 
+    // Methods to Manage Users
 
+    public void addPatient(Patient patient, MongoDatabase database) {
+        MongoCollection<Document> collection = database.getCollection("patients");
+        Document doc = new Document("id", patient.getId())
+                .append("fullName", patient.getFullName())
+                .append("email", patient.getEmail())
+                .append("password", patient.getPassword())
+                .append("phoneNumber", patient.getPhoneNumber())
+                .append("address", patient.getAddress())
+                .append("loyaltyDiscount", patient.getLoyaltyDiscount())
+                .append("age", patient.getAge())
+                .append("gender", patient.getGender())
+                .append("emergencyContact", patient.getEmergencyContact())
+                .append("issue", patient.getIssue());
 
-    // Methods
-    public void viewUserDetails(User user) {
-        System.out.println("Viewing User Details:");
-        System.out.println("ID: " + user.getId());
-        System.out.println("Name: " + user.getFullName());
-        System.out.println("Email: " + user.getEmail());
-        System.out.println("Phone: " + user.getPhoneNumber());
+        saveOrUpdateUser(collection, doc);
     }
 
-    public void generateReport(String reportType) {
-        System.out.println("Generating report of type: " + reportType);
-        // Logic to create a Report object and generate it
+    public void addPharmacist(Pharmacist pharmacist, MongoDatabase database) {
+        MongoCollection<Document> collection = database.getCollection("pharmacists");
+        Document doc = new Document("id", pharmacist.getId())
+                .append("fullName", pharmacist.getFullName())
+                .append("email", pharmacist.getEmail())
+                .append("password", pharmacist.getPassword())
+                .append("phoneNumber", pharmacist.getPhoneNumber())
+                .append("salary", pharmacist.getSalary())
+                .append("licenseNumber", pharmacist.getLicenseNumber())
+                .append("specialization", pharmacist.getSpecialization());
+
+        saveOrUpdateUser(collection, doc);
     }
 
-    public void addUser(User newUser) {
-        System.out.println("User added successfully: " + newUser.getFullName());
-        // Logic to interact with a UserMapper or database
+    public void addInventoryClerk(InventoryClerk clerk, MongoDatabase database) {
+        MongoCollection<Document> collection = database.getCollection("inventory_clerks");
+        Document doc = new Document("id", clerk.getId())
+                .append("fullName", clerk.getFullName())
+                .append("email", clerk.getEmail())
+                .append("password", clerk.getPassword())
+                .append("phoneNumber", clerk.getPhoneNumber())
+                .append("salary", clerk.getSalary())
+                .append("department", clerk.getDepartment());
+
+        saveOrUpdateUser(collection, doc);
     }
 
-    public void removeUser(int userId) {
-        System.out.println("User with ID " + userId + " removed successfully.");
-        // Logic to interact with a UserMapper or database
+    public void addSupplier(Supplier supplier, MongoDatabase database) {
+        // Get the suppliers collection from the database
+        MongoCollection<Document> collection = database.getCollection("suppliers");
+
+        // Create a document representing the supplier
+        Document doc = new Document("companyName", supplier.getCompanyName())
+                .append("supplierContact", supplier.getSupplierContact())
+                .append("companyAddress", supplier.getCompanyAddress());
+
+        // Check if a supplier with the same company name already exists
+        if (collection.find(eq("companyName", supplier.getCompanyName())).first() == null) {
+            // Insert new supplier into the collection
+            collection.insertOne(doc);
+            System.out.println("Supplier added: " + supplier.getCompanyName());
+        } else {
+            // Update existing supplier with new data
+            collection.updateOne(eq("companyName", supplier.getCompanyName()), new Document("$set", doc));
+            System.out.println("Supplier updated: " + supplier.getCompanyName());
+        }
     }
 
-    public void viewInquiry() {
-        System.out.println("Viewing customer inquiries...");
-        // Logic to fetch inquiries from the database
+
+    public void addAdmin(Admin admin, MongoDatabase database) {
+        MongoCollection<Document> collection = database.getCollection("admins");
+        Document doc = new Document("id", admin.getId())
+                .append("fullName", admin.getFullName())
+                .append("email", admin.getEmail())
+                .append("password", admin.getPassword())
+                .append("phoneNumber", admin.getPhoneNumber())
+                .append("salary", admin.getSalary())
+                .append("accessLevel", admin.getAccessLevel().toString());
+
+        saveOrUpdateUser(collection, doc);
     }
 
-    public void createPromotion(String description, int percentage) {
-        System.out.println("Creating promotion: " + description + " with " + percentage + "% discount.");
-        // Logic to create and save a promotion
+    public void addCashier(Cashier cashier, MongoDatabase database) {
+        MongoCollection<Document> collection = database.getCollection("cashiers");
+        Document doc = new Document("id", cashier.getId())
+                .append("fullName", cashier.getFullName())
+                .append("email", cashier.getEmail())
+                .append("password", cashier.getPassword())
+                .append("phoneNumber", cashier.getPhoneNumber())
+                .append("salary", cashier.getSalary());
+
+        saveOrUpdateUser(collection, doc);
     }
 
-    public void answerCustomerInquiry(String answer) {
-        System.out.println("Answering customer inquiry: " + answer);
-        // Logic to interact with an Inquiry object
+    private void saveOrUpdateUser(MongoCollection<Document> collection, Document doc) {
+        if (collection.find(eq("id", doc.getInteger("id"))).first() == null) {
+            collection.insertOne(doc);
+            System.out.println("User added: " + doc.getString("fullName"));
+        } else {
+            collection.updateOne(eq("id", doc.getInteger("id")), new Document("$set", doc));
+            System.out.println("User updated: " + doc.getString("fullName"));
+        }
     }
 
-    public void setEmployeeSalary(Cashier cashier, int newSalary) {
-        cashier.salary = newSalary; // Accessing private field directly because Admin is a trusted authority
-        System.out.println("Salary updated for " + cashier.getFullName() + ": $" + newSalary);
-    }
-    public void setEmployeeSalary(Pharmacist pharmacist, int newSalary) {
-        pharmacist.salary = newSalary; // Accessing private salary field
-        System.out.println("Salary updated for " + pharmacist.getFullName() + ": $" + newSalary);
+    public void removeUser(int userId, MongoDatabase database, String userType) {
+        MongoCollection<Document> collection = database.getCollection(userType);
+        if (collection.find(eq("id", userId)).first() != null) {
+            collection.deleteOne(eq("id", userId));
+            System.out.println("User with ID " + userId + " removed from " + userType + " collection.");
+        } else {
+            System.out.println("User with ID " + userId + " not found in " + userType + " collection.");
+        }
     }
 
+    public void viewAllUsers(MongoDatabase database, String userType) {
+        MongoCollection<Document> collection = database.getCollection(userType);
+        for (Document doc : collection.find()) {
+            System.out.println("ID: " + doc.getInteger("id"));
+            System.out.println("Name: " + doc.getString("fullName"));
+            System.out.println("Email: " + doc.getString("email"));
+            System.out.println("Phone Number: " + doc.getLong("phoneNumber"));
+            System.out.println("------------------------");
+        }
+    }
 }

@@ -11,13 +11,13 @@ public class Patient extends User {
     private int age;
     private String emergencyContact;
     private String issue;
-    private String loyaltyDiscount;
+    private int loyaltyDiscount;
     private Insurance insurance; // Aggregation: Patient can have an Insurance
 
     // Constructor
     public Patient(int id, String fullName, String email, String password, long phoneNumber,
                    String address, String gender, int age, String emergencyContact, String issue,
-                   String loyaltyDiscount, Insurance insurance) {
+                   int loyaltyDiscount, Insurance insurance) {
         super(id, fullName, email, password, phoneNumber);
         this.address = address;
         this.gender = gender;
@@ -90,11 +90,11 @@ public class Patient extends User {
         return issue;
     }
 
-    public void setLoyaltyDiscount(String loyaltyDiscount) {
+    public void setLoyaltyDiscount(int loyaltyDiscount) {
         this.loyaltyDiscount = loyaltyDiscount;
     }
 
-    public String getLoyaltyDiscount() {
+    public int getLoyaltyDiscount() {
         return loyaltyDiscount;
     }
 
