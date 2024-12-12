@@ -1,9 +1,13 @@
 package aoose_main.entities.actors;
 
+import aoose_main.entities.others.Insurance;
 import aoose_main.enums.AccessLevels;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -51,8 +55,24 @@ public class Admin extends User {
                 .append("emergencyContact", patient.getEmergencyContact())
                 .append("issue", patient.getIssue());
 
-        saveOrUpdateUser(collection, doc);
+        // Add Insurance to the patient document
+        Insurance insurance = patient.getInsurance();
+        if (insurance != null) {
+            doc.append("insurance", insurance.toDocument());
+        }
+
+        // Save or update the patient in the database
+        if (collection.find(eq("id", patient.getId())).first() == null) {
+            collection.insertOne(doc);
+            System.out.println("Patient added: " + patient.getFullName());
+        } else {
+            collection.updateOne(eq("id", patient.getId()), new Document("$set", doc));
+            System.out.println("Patient updated: " + patient.getFullName());
+        }
     }
+
+
+
 
     public void addPharmacist(Pharmacist pharmacist, MongoDatabase database) {
         MongoCollection<Document> collection = database.getCollection("pharmacists");
@@ -67,6 +87,20 @@ public class Admin extends User {
 
         saveOrUpdateUser(collection, doc);
     }
+    public void addInsuranceProvider(InsuranceProvider insuranceProvider, MongoDatabase database) {
+        MongoCollection<Document> collection = database.getCollection("insurance_providers");
+        Document doc = new Document("id", insuranceProvider.getId())
+                .append("fullName", insuranceProvider.getFullName())
+                .append("email", insuranceProvider.getEmail())
+                .append("password", insuranceProvider.getPassword())
+                .append("phoneNumber", insuranceProvider.getPhoneNumber())
+                .append("termsAndConditions", insuranceProvider.getTermsAndConditions())
+                .append("companyName", insuranceProvider.getCompanyName())
+                .append("coverageRate", insuranceProvider.getCoverageDetails()); // Update with coverageRate field
+
+        saveOrUpdateUser(collection, doc);
+    }
+
 
     public void addInventoryClerk(InventoryClerk clerk, MongoDatabase database) {
         MongoCollection<Document> collection = database.getCollection("inventory_clerks");
@@ -82,26 +116,17 @@ public class Admin extends User {
     }
 
     public void addSupplier(Supplier supplier, MongoDatabase database) {
-        // Get the suppliers collection from the database
         MongoCollection<Document> collection = database.getCollection("suppliers");
-
-        // Create a document representing the supplier
-        Document doc = new Document("companyName", supplier.getCompanyName())
-                .append("supplierContact", supplier.getSupplierContact())
+        Document doc = new Document("id", supplier.getId())
+                .append("fullName", supplier.getFullName())
+                .append("email", supplier.getEmail())
+                .append("password", supplier.getPassword())
+                .append("phoneNumber", supplier.getPhoneNumber())
+                .append("companyName", supplier.getCompanyName())
                 .append("companyAddress", supplier.getCompanyAddress());
 
-        // Check if a supplier with the same company name already exists
-        if (collection.find(eq("companyName", supplier.getCompanyName())).first() == null) {
-            // Insert new supplier into the collection
-            collection.insertOne(doc);
-            System.out.println("Supplier added: " + supplier.getCompanyName());
-        } else {
-            // Update existing supplier with new data
-            collection.updateOne(eq("companyName", supplier.getCompanyName()), new Document("$set", doc));
-            System.out.println("Supplier updated: " + supplier.getCompanyName());
-        }
+        saveOrUpdateUser(collection, doc);
     }
-
 
     public void addAdmin(Admin admin, MongoDatabase database) {
         MongoCollection<Document> collection = database.getCollection("admins");

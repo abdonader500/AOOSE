@@ -3,20 +3,17 @@ package aoose_main.entities.actors;
 import aoose_main.entities.abstraction.Item;
 import aoose_main.entities.others.Order;
 import aoose_main.enums.OrderStatus;
-import aoose_main.remotePattern.InventoryDTO;
-
-import java.util.ArrayList;
 import java.util.List;
 
-public class Supplier {
+public class Supplier extends User {
     private String companyName;
-    private long supplierContact;
     private String companyAddress;
 
     // Constructor
-    public Supplier(String companyName, long supplierContact, String companyAddress) {
+    public Supplier(int id, String fullName, String email, String password, long phoneNumber,
+                    String companyName, String companyAddress) {
+        super(id, fullName, email, password, phoneNumber); // Call the parent constructor
         this.companyName = companyName;
-        this.supplierContact = supplierContact;
         this.companyAddress = companyAddress;
     }
 
@@ -27,14 +24,6 @@ public class Supplier {
 
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
-    }
-
-    public long getSupplierContact() {
-        return supplierContact;
-    }
-
-    public void setSupplierContact(long supplierContact) {
-        this.supplierContact = supplierContact;
     }
 
     public String getCompanyAddress() {

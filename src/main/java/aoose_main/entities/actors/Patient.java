@@ -5,6 +5,8 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
+import static com.mongodb.client.model.Filters.eq;
+
 public class Patient extends User {
     private String address;
     private String gender;
@@ -12,7 +14,9 @@ public class Patient extends User {
     private String emergencyContact;
     private String issue;
     private int loyaltyDiscount;
-    private Insurance insurance; // Aggregation: Patient can have an Insurance
+    private int insuranceID; // Reference to the insurance
+
+    private static MongoCollection<Document> insuranceCollection;
 
     // Constructor
     public Patient(int id, String fullName, String email, String password, long phoneNumber,
@@ -25,14 +29,33 @@ public class Patient extends User {
         this.emergencyContact = emergencyContact;
         this.issue = issue;
         this.loyaltyDiscount = loyaltyDiscount;
-        this.insurance = insurance;
+
+        // Set the insuranceID from the Insurance object
+        this.insuranceID = (insurance != null) ? (int) insurance.getInsuranceID() : 0;
+    }
+
+
+
+    // Static method to initialize the MongoDB insurance collection
+    public static void initializeDatabase(MongoDatabase database) {
+        insuranceCollection = database.getCollection("insurances");
     }
 
     // Methods to interact with the database for insurance
-    public void sendInsuranceForm(MongoDatabase database) {
-        if (this.insurance != null) {
-            this.insurance.sendForm(database);
+    public Insurance getInsurance() {
+        if (insuranceCollection == null) {
+            throw new IllegalStateException("Database collection is not initialized.");
         }
+        Document doc = insuranceCollection.find(eq("insuranceID", insuranceID)).first();
+        return doc != null ? Insurance.fromDocument(doc) : null;
+    }
+
+    public void setInsuranceID(int insuranceID) {
+        this.insuranceID = insuranceID;
+    }
+
+    public int getInsuranceID() {
+        return insuranceID;
     }
 
     // Write an inquiry related to the patient
@@ -42,11 +65,6 @@ public class Patient extends User {
                 .append("message", inquiryMessage)
                 .append("status", "pending");
         collection.insertOne(inquiry);
-    }
-
-    // Update insurance details
-    public void updateInsurance(Insurance newInsurance) {
-        this.insurance = newInsurance;
     }
 
     // Setters & Getters
@@ -98,8 +116,40 @@ public class Patient extends User {
         return loyaltyDiscount;
     }
 
-    public Insurance getInsurance() {
-        return insurance;
+    public static Patient loadFromDatabase(int id, MongoDatabase database) {
+        // Get the MongoDB collection for patients
+        MongoCollection<Document> collection = database.getCollection("patients");
+
+        // Find the patient by ID
+        Document doc = collection.find(eq("id", id)).first();
+        if (doc != null) {
+            // Extract the insurance document if it exists
+            Insurance insurance = null;
+            if (doc.containsKey("insurance")) {
+                Document insuranceDoc = (Document) doc.get("insurance");
+                insurance = Insurance.fromDocument(insuranceDoc);
+            }
+
+            // Return the patient object constructed from the database document
+            return new Patient(
+                    doc.getInteger("id"),
+                    doc.getString("fullName"),
+                    doc.getString("email"),
+                    doc.getString("password"),
+                    doc.getLong("phoneNumber"),
+                    doc.getString("address"),
+                    doc.getString("gender"),
+                    doc.getInteger("age"),
+                    doc.getString("emergencyContact"),
+                    doc.getString("issue"),
+                    doc.getInteger("loyaltyDiscount"),
+                    insurance
+            );
+        }
+
+        // Log if the patient was not found
+        System.out.println("Patient with ID " + id + " not found in the database.");
+        return null;
     }
 
     // Display patient details
@@ -111,8 +161,13 @@ public class Patient extends User {
         System.out.println("Emergency Contact: " + getEmergencyContact());
         System.out.println("Issue: " + getIssue());
         System.out.println("Loyalty Discount: " + getLoyaltyDiscount());
+        System.out.println("Insurance ID: " + insuranceID);
+
+        Insurance insurance = getInsurance();
         if (insurance != null) {
             insurance.displayInsuranceDetails();
+        } else {
+            System.out.println("No insurance assigned or insurance not found.");
         }
     }
 }

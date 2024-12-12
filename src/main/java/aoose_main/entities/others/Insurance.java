@@ -35,25 +35,43 @@ public class Insurance {
             return null;
         }
 
-        long insuranceProviderID = insuranceDoc.getLong("insuranceProviderID");
-        long insuranceID = insuranceDoc.getLong("insuranceID");
-        int insurancePercentage = insuranceDoc.getInteger("insurancePercentage", 0); // Providing a default value
-        long patientID = insuranceDoc.getLong("patientID");
+        long insuranceProviderID = 0;
+        if (insuranceDoc.get("insuranceProviderID") != null) {
+            insuranceProviderID = insuranceDoc.get("insuranceProviderID") instanceof Integer
+                    ? insuranceDoc.getInteger("insuranceProviderID").longValue()
+                    : insuranceDoc.getLong("insuranceProviderID");
+        }
+
+        long insuranceID = 0;
+        if (insuranceDoc.get("insuranceID") != null) {
+            insuranceID = insuranceDoc.get("insuranceID") instanceof Integer
+                    ? insuranceDoc.getInteger("insuranceID").longValue()
+                    : insuranceDoc.getLong("insuranceID");
+        }
+
+        int insurancePercentage = insuranceDoc.getInteger("insurancePercentage", 0);
+        long patientID = 0;
+        if (insuranceDoc.get("patientID") != null) {
+            patientID = insuranceDoc.get("patientID") instanceof Integer
+                    ? insuranceDoc.getInteger("patientID").longValue()
+                    : insuranceDoc.getLong("patientID");
+        }
 
         // Recreate insurance tiers if they exist
         List<Document> tierDocs = insuranceDoc.getList("insuranceTier", Document.class);
         List<Insurance> insuranceTier = new ArrayList<>();
         if (tierDocs != null) {
             for (Document tierDoc : tierDocs) {
-                Insurance tier = Insurance.fromDocument(tierDoc);
-                if (tier != null) {
-                    insuranceTier.add(tier);
-                }
+                insuranceTier.add(Insurance.fromDocument(tierDoc));
             }
         }
 
         return new Insurance(insuranceProviderID, insuranceID, insuranceTier, insurancePercentage, patientID);
     }
+
+
+
+
 
     // Method to convert an Insurance object to a MongoDB Document
     public Document toDocument() {
