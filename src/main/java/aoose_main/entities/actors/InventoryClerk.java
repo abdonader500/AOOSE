@@ -47,6 +47,7 @@ public class InventoryClerk extends User {
     }
 
     // Approve an order and add items to inventory
+    // Approve an order and add items to inventory
     public void approveOrder(int orderId, List<InventoryDTO> inventory, InventoryDAO inventoryDAO) {
         Order order = requestOrder(orderId);
         if (order != null && order.getStatus() == OrderStatus.Pending) {
@@ -55,22 +56,51 @@ public class InventoryClerk extends User {
             order.saveToDatabase();
             System.out.println("Order with ID " + orderId + " approved and marked as Received.");
 
-            // Add the items from the order to the inventory and save to the database
+            // Add or update items in the inventory
             for (Item item : order.getItems()) {
-                InventoryDTO inventoryItem = new InventoryDTO(
-                        (int) item.getItemID(),
-                        item.getName(),
-                        item.getPrice(),
-                        item.getQuantity()
-                );
-                inventory.add(inventoryItem);  // Add to in-memory list
-                inventoryDAO.createItem(inventoryItem);  // Persist in the database
-                System.out.println("Added to inventory: " + inventoryItem.getItemName());
+                if (item == null || item.getItemID() <= 0 || item.getName() == null || item.getQuantity() <= 0) {
+                    System.out.println("Skipping invalid item in order: " + order.getOrderID());
+                    continue;
+                }
+
+                // Check for existing item by item ID
+                InventoryDTO existingItem = inventoryDAO.getItemById((int) item.getItemID());
+
+                if (existingItem != null) {
+                    // Update the quantity of the existing item
+                    int updatedQuantity = existingItem.getQuantity() + item.getQuantity();
+                    InventoryDTO updatedItem = new InventoryDTO(
+                            existingItem.getItemID(),
+                            existingItem.getItemName(),
+                            existingItem.getPrice(),
+                            updatedQuantity
+                    );
+                    inventoryDAO.updateItem(updatedItem); // Persist updated item
+
+                    // Update the in-memory list
+                    inventory.removeIf(invItem -> invItem.getItemID() == updatedItem.getItemID());
+                    inventory.add(updatedItem);
+                    System.out.println("Updated inventory item: " + updatedItem.getItemName() + " with new quantity: " + updatedQuantity);
+                } else {
+                    // Create a new inventory item
+                    InventoryDTO newItem = new InventoryDTO(
+                            (int) item.getItemID(),
+                            item.getName(),
+                            item.getPrice(),
+                            item.getQuantity()
+                    );
+                    inventoryDAO.createItem(newItem); // Persist new item
+                    inventory.add(newItem); // Add to in-memory list
+                    System.out.println("Added new inventory item: " + newItem.getItemName());
+                }
             }
         } else {
             System.out.println("Order with ID " + orderId + " cannot be approved.");
         }
     }
+
+
+
 
 
     // Reject an order

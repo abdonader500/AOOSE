@@ -24,15 +24,15 @@ public class InventoryDAO {
 
     // Get an item by its name
     public InventoryDTO getItemByName(String name) {
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("Item name cannot be null or empty.");
-        }
         Document doc = collection.find(eq("name", name)).first();
         if (doc != null) {
             return mapDocumentToDTO(doc);
+        } else {
+            System.out.println("Item with name " + name + " not found.");
+            return null;
         }
-        return null;
     }
+
 
     // Get an item by ID
     public InventoryDTO getItemById(long id) {
@@ -59,12 +59,13 @@ public class InventoryDAO {
         if (item == null) {
             throw new IllegalArgumentException("Item cannot be null.");
         }
-        Document doc = new Document("item_id", item.getItemName().hashCode()) // Added ID logic
+        Document doc = new Document("item_id", item.getItemID())
                 .append("name", item.getItemName())
                 .append("price", item.getPrice())
                 .append("quantity", item.getQuantity());
         collection.insertOne(doc);
     }
+
 
     // Delete an item by name
     public void deleteItemByName(String name) {
