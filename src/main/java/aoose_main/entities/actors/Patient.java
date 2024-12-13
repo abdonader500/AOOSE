@@ -152,6 +152,12 @@ public class Patient extends User {
         return null;
     }
 
+    public void updateLoyaltyDiscountInDatabase(MongoDatabase database) {
+        MongoCollection<Document> collection = database.getCollection("patients");
+        collection.updateOne(eq("id", getId()), new Document("$set", new Document("loyaltyDiscount", loyaltyDiscount)));
+        System.out.println("Loyalty discount updated in database for patient ID: " + getId());
+    }
+
     // Display patient details
     public void displayPatientDetails() {
         System.out.println("Patient Name: " + getFullName());
