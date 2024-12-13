@@ -1,57 +1,56 @@
 package aoose_main.entities.abstraction;
 
+import java.util.Date;
+
 public class PromotionInstance {
     private long instanceID; // Unique identifier for this promotion instance
     private Promotion promotionRef; // Reference to the abstract promotion
-    private String startDate; // Specific start date for this instance
-    private String endDate; // Specific end date for this instance
+    private Date startDate; // Specific start date for this instance
+    private Date endDate; // Specific end date for this instance
 
     // Constructor
-    public PromotionInstance(long instanceID, Promotion promotionRef, String startDate, String endDate) {
+    public PromotionInstance(long instanceID, Promotion promotionRef, Date startDate, Date endDate) {
         this.instanceID = instanceID;
         this.promotionRef = promotionRef;
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
-
-    // setters and getters
+    // Getters and setters
+    public long getInstanceID() {
+        return instanceID;
+    }
 
     public void setInstanceID(long instanceID) {
         this.instanceID = instanceID;
-    }
-
-    public void setPromotionRef(Promotion promotionRef) {
-        this.promotionRef = promotionRef;
-    }
-
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
-    }
-
-    public void setEndDate(String endDate) {
-        this.endDate = endDate;
-    }
-
-    public long getInstanceID() {
-        return instanceID;
     }
 
     public Promotion getPromotionRef() {
         return promotionRef;
     }
 
-    public String getStartDate() {
+    public void setPromotionRef(Promotion promotionRef) {
+        this.promotionRef = promotionRef;
+    }
+
+    public Date getStartDate() {
         return startDate;
     }
 
-    public String getEndDate() {
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
         return endDate;
     }
 
-    // Method to check if this instance is within its specific validity period
-    public boolean isInstanceActive(String currentDate) {
-        // Compare currentDate with startDate and endDate
-        return currentDate.compareTo(startDate) >= 0 && currentDate.compareTo(endDate) <= 0;
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    // Method to check if this instance is active
+    public boolean isActive(Date currentDate) {
+        return currentDate.after(startDate) && currentDate.before(endDate);
     }
 }
