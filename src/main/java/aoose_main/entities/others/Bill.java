@@ -11,6 +11,7 @@ import java.util.List;
 
 public class Bill implements BillDecorator {
     private int id; // Unique identifier for the bill
+    private double insuranceDiscount = 0;
     private List<Item> items; // List of items in the bill
     private int patientId; // ID of the patient for whom the bill is generated
     private double totalAmount; // Total amount for the bill
@@ -62,6 +63,13 @@ public class Bill implements BillDecorator {
     public void setPaymentId(String paymentId) {
         this.paymentId = paymentId;
     }
+    public double getInsuranceDiscount() {
+        return insuranceDiscount;
+    }
+
+    public void setInsuranceDiscount(double insuranceDiscount) {
+        this.insuranceDiscount = insuranceDiscount;
+    }
 
     private int generateUniqueId() {
         return (int) (System.currentTimeMillis() & 0xfffffff); // Example logic
@@ -73,6 +81,11 @@ public class Bill implements BillDecorator {
             total += item.getPrice() * item.getQuantity();
         }
         return total;
+    }
+
+    public void applyInsuranceDiscount(double amount) {
+        insuranceDiscount += amount; // Add the insurance discount to the total discount
+        discount += amount; // Include the insurance discount in the total discount
     }
 
     // Apply promotion
@@ -99,6 +112,7 @@ public class Bill implements BillDecorator {
                 .append("patientId", this.patientId)
                 .append("paymentId", this.paymentId)
                 .append("totalAmount", this.totalAmount)
+                .append("insuranceDiscount", this.insuranceDiscount)
                 .append("discount", this.discount)
                 .append("amountPaid", this.amountPaid)
                 .append("items", this.items.stream().map(item -> {
@@ -117,10 +131,13 @@ public class Bill implements BillDecorator {
         MongoCollection<Document> collection = database.getCollection("bills");
         Document updateDoc = new Document("$set", new Document()
                 .append("paymentId", this.paymentId)
-                .append("amountPaid", this.amountPaid));
+                .append("amountPaid", this.amountPaid)
+                .append("discount", this.discount)
+                .append("insuranceDiscount", this.insuranceDiscount)); // Update insurance discount
         collection.updateOne(new Document("id", this.id), updateDoc);
         System.out.println("Bill updated in database with ID: " + this.id);
     }
+
 
     // Display bill details
     @Override

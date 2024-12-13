@@ -1,5 +1,6 @@
 package aoose_main.entities.actors;
 
+import aoose_main.entities.others.Insurance;
 import aoose_main.entities.others.MakePayment;
 import aoose_main.entities.others.Payment;
 import aoose_main.entities.others.Bill;
@@ -88,6 +89,17 @@ public class Cashier extends User {
         }
     }
 
+    public void addInsuranceDiscount(Bill bill, Patient patient, MongoDatabase database) {
+        Insurance patientInsurance = patient.getInsurance();
+        if (patientInsurance != null) {
+            double insuranceDiscount = bill.getTotalAmount() * patientInsurance.getInsurancePercentage() / 100.0;
+            bill.applyInsuranceDiscount(insuranceDiscount); // Apply the insurance discount
+            bill.updateInDatabase(database); // Update the bill in the database
+            System.out.println("Insurance discount of $" + insuranceDiscount + " applied for patient ID: " + patient.getId());
+        } else {
+            System.out.println("No insurance available for patient ID: " + patient.getId());
+        }
+    }
     // Apply loyalty discount
     public void applyLoyaltyDiscount(Bill bill, Patient patient, MongoDatabase database) {
         if (patient.getLoyaltyDiscount() >= 1000) {
@@ -95,6 +107,12 @@ public class Cashier extends User {
             patient.setLoyaltyDiscount(patient.getLoyaltyDiscount() - 1000); // Deduct 1000 points
             patient.updateLoyaltyDiscountInDatabase(database);
             System.out.println("Loyalty discount applied and updated for patient ID: " + patient.getId());
+        }
+        else{
+            double amountPaid = bill.getTotalAfterDiscounts();
+            patient.setLoyaltyDiscount(patient.getLoyaltyDiscount() + (int) amountPaid);
+            patient.updateLoyaltyDiscountInDatabase(database);
+            System.out.println("Amount of " + (int) amountPaid + " added to the loyalty discount for patient ID: " + patient.getId());
         }
     }
 
