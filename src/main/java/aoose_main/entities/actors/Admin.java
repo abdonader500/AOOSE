@@ -3,6 +3,7 @@ package aoose_main.entities.actors;
 
 import aoose_main.entities.abstraction.Promotion;
 import aoose_main.entities.abstraction.PromotionInstance;
+import aoose_main.entities.others.Feedback;
 import aoose_main.entities.others.Inquiry;
 import aoose_main.entities.others.Insurance;
 import aoose_main.enums.AccessLevels;
@@ -42,6 +43,20 @@ public class Admin extends User {
         return accessLevel;
     }
 
+    public void updateUser(int userId, MongoDatabase database, String userType, Document updatedFields) {
+        MongoCollection<Document> collection = database.getCollection(userType);
+
+        // Check if user exists
+        Document existingUser = collection.find(eq("id", userId)).first();
+        if (existingUser == null) {
+            System.out.println("User with ID " + userId + " not found in " + userType + " collection.");
+            return;
+        }
+
+        // Update user fields
+        collection.updateOne(eq("id", userId), new Document("$set", updatedFields));
+        System.out.println("User with ID " + userId + " updated in " + userType + " collection.");
+    }
     // Methods to Manage Users
 
     public void addPatient(Patient patient, MongoDatabase database) {
@@ -168,23 +183,42 @@ public class Admin extends User {
 
     public void removeUser(int userId, MongoDatabase database, String userType) {
         MongoCollection<Document> collection = database.getCollection(userType);
-        if (collection.find(eq("id", userId)).first() != null) {
-            collection.deleteOne(eq("id", userId));
-            System.out.println("User with ID " + userId + " removed from " + userType + " collection.");
-        } else {
+        // Check if user exists
+        Document existingUser = collection.find(eq("id", userId)).first();
+        if (existingUser == null) {
             System.out.println("User with ID " + userId + " not found in " + userType + " collection.");
+            return;
         }
+        // Remove user
+        collection.deleteOne(eq("id", userId));
+        System.out.println("User with ID " + userId + " removed from " + userType + " collection.");
     }
 
-    public void viewAllUsers(MongoDatabase database, String userType) {
-        MongoCollection<Document> collection = database.getCollection(userType);
-        for (Document doc : collection.find()) {
-            System.out.println("ID: " + doc.getInteger("id"));
-            System.out.println("Name: " + doc.getString("fullName"));
-            System.out.println("Email: " + doc.getString("email"));
-            System.out.println("Phone Number: " + doc.getLong("phoneNumber"));
-            System.out.println("------------------------");
+    public List<Document> loadUsersFromDatabase(MongoDatabase database, String userType, Integer userId) {
+        if (userType == null || userType.isEmpty()) {
+            throw new IllegalArgumentException("User type cannot be null or empty.");
         }
+
+        MongoCollection<Document> collection = database.getCollection(userType);
+
+        List<Document> users = new ArrayList<>();
+
+        if (userId != null) {
+            // Load a specific user by ID
+            Document userDoc = collection.find(eq("id", userId)).first();
+            if (userDoc != null) {
+                users.add(userDoc);
+            } else {
+                System.out.println("User with ID " + userId + " not found in " + userType + " collection.");
+            }
+        } else {
+            // Load all users of the specified type
+            for (Document doc : collection.find()) {
+                users.add(doc);
+            }
+        }
+
+        return users;
     }
 
     public void addPromotion(Promotion promotion, MongoDatabase database) {
@@ -241,4 +275,13 @@ public class Admin extends User {
             System.out.println("-------------------------");
         }
     }
+    public void viewFeedback(MongoDatabase database) {
+        List<Feedback> feedbackList = Feedback.loadFromDatabase(database);
+        System.out.println("Feedback List:");
+        for (Feedback feedback : feedbackList) {
+            feedback.displayFeedback();
+        }
+    }
+
+
 }

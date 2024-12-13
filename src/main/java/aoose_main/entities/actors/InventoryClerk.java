@@ -1,13 +1,16 @@
 package aoose_main.entities.actors;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import aoose_main.InventoryDAO;
 import aoose_main.entities.abstraction.Item;
+import aoose_main.entities.others.Feedback;
 import aoose_main.entities.others.Order;
 import aoose_main.enums.OrderStatus;
 import aoose_main.remotePattern.InventoryDTO;
+import com.mongodb.client.MongoDatabase;
 
 public class InventoryClerk extends User {
     private int salary;
@@ -115,6 +118,11 @@ public class InventoryClerk extends User {
         }
     }
 
+    public void writeFeedback(int feedbackId, int supplierID, String message, MongoDatabase database) {
+        Feedback feedback = new Feedback(feedbackId, supplierID, message, LocalDateTime.now());
+        feedback.saveToDatabase(database);
+        System.out.println("Feedback written by Inventory Clerk with ID: " + this.getId());
+    }
     // View details of an order
     public void viewOrderDetails(int orderId) {
         Order order = requestOrder(orderId);
