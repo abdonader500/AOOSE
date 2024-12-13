@@ -4,7 +4,7 @@ import aoose_main.enums.ListTypes;
 import aoose_main.entities.actors.Cashier;
 import aoose_main.enums.Shifts;
 
-public class List extends Cashier {
+public class List<I> extends Cashier {
     private long ID;
     private ListTypes listType;
 

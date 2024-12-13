@@ -1,13 +1,14 @@
 package aoose_main.entities.actors;
 
+
 import aoose_main.entities.abstraction.Promotion;
 import aoose_main.entities.abstraction.PromotionInstance;
+import aoose_main.entities.others.Inquiry;
 import aoose_main.entities.others.Insurance;
 import aoose_main.enums.AccessLevels;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -227,5 +228,17 @@ public class Admin extends User {
 
         collection.insertOne(doc);
         System.out.println("Promotion instance added with ID: " + promotionInstance.getInstanceID());
+    }
+    public void viewAllInquiries(MongoDatabase database) {
+        List<Inquiry> inquiries = (List<Inquiry>) Inquiry.loadFromDatabase(database);
+        if (inquiries.isEmpty()) {
+            System.out.println("No inquiries found in the database.");
+            return;
+        }
+
+        for (Inquiry inquiry : inquiries) {
+            inquiry.displayInquiryDetails();
+            System.out.println("-------------------------");
+        }
     }
 }

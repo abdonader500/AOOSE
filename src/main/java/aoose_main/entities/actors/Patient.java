@@ -1,5 +1,6 @@
 package aoose_main.entities.actors;
 
+import aoose_main.entities.others.Inquiry;
 import aoose_main.entities.others.Insurance;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -60,11 +61,20 @@ public class Patient extends User {
 
     // Write an inquiry related to the patient
     public void writeInquiry(MongoDatabase database, String inquiryMessage) {
-        MongoCollection<Document> collection = database.getCollection("inquiries");
-        Document inquiry = new Document("patientId", getId())
-                .append("message", inquiryMessage)
-                .append("status", "pending");
-        collection.insertOne(inquiry);
+        if (inquiryMessage == null || inquiryMessage.isEmpty()) {
+            throw new IllegalArgumentException("Inquiry message cannot be null or empty.");
+        }
+
+        // Generate a unique inquiry ID (e.g., based on current time)
+        int inquiryId = (int) (System.currentTimeMillis() & 0xfffffff);
+
+        // Create an Inquiry object
+        Inquiry inquiry = new Inquiry(inquiryId, this.getId(), inquiryMessage);
+
+        // Save to database
+        inquiry.saveToDatabase(database);
+
+        System.out.println("Inquiry written for patient ID: " + this.getId());
     }
 
     // Setters & Getters
