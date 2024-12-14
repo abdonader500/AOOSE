@@ -20,6 +20,7 @@ public class Inquiry {
         this.inquiryId = inquiryId;
         this.patientId = patientId;
         this.message = message;
+        this.status = "Pending"; // Default status
         this.timestamp = new Date(); // Current timestamp
     }
 
@@ -48,6 +49,14 @@ public class Inquiry {
         this.message = message;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public Date getTimestamp() {
         return timestamp;
     }
@@ -63,6 +72,7 @@ public class Inquiry {
         Document doc = new Document("inquiryId", this.inquiryId)
                 .append("patientId", this.patientId)
                 .append("message", this.message)
+                .append("status", this.status)
                 .append("timestamp", this.timestamp);
 
         collection.insertOne(doc);
@@ -80,6 +90,7 @@ public class Inquiry {
                     doc.getInteger("patientId"),
                     doc.getString("message")
             );
+            inquiry.setStatus(doc.getString("status"));
             inquiry.setTimestamp(doc.getDate("timestamp"));
             inquiries.add(inquiry);
         }
@@ -92,6 +103,7 @@ public class Inquiry {
         System.out.println("Inquiry ID: " + inquiryId);
         System.out.println("Patient ID: " + patientId);
         System.out.println("Message: " + message);
+        System.out.println("Status: " + status);
         System.out.println("Timestamp: " + timestamp);
     }
 }
