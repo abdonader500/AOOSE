@@ -1,7 +1,5 @@
 package aoose_main.entities.actors;
 
-import aoose_main.entities.abstraction.Promotion;
-import aoose_main.entities.abstraction.PromotionInstance;
 import aoose_main.entities.others.Insurance;
 import aoose_main.enums.AccessLevels;
 import com.mongodb.client.MongoCollection;
@@ -184,48 +182,5 @@ public class Admin extends User {
             System.out.println("Phone Number: " + doc.getLong("phoneNumber"));
             System.out.println("------------------------");
         }
-    }
-
-    public void addPromotion(Promotion promotion, MongoDatabase database) {
-        MongoCollection<Document> collection = database.getCollection("promotions");
-
-        // Check for duplicate promotion name
-        if (collection.find(eq("name", promotion.getName())).first() != null) {
-            System.out.println("Error: A promotion with the same name already exists.");
-            return;
-        }
-
-        Document doc = new Document("name", promotion.getName())
-                .append("description", promotion.getDescription())
-                .append("discountPercentage", promotion.getDiscountPercentage());
-
-        collection.insertOne(doc);
-        System.out.println("Promotion added: " + promotion.getName());
-    }
-
-    public void addPromotionInstance(PromotionInstance promotionInstance, MongoDatabase database) {
-        MongoCollection<Document> collection = database.getCollection("promotion_instances");
-
-        // Check for duplicate promotion instance ID
-        if (collection.find(eq("instanceID", promotionInstance.getInstanceID())).first() != null) {
-            System.out.println("Error: A promotion instance with the same ID already exists.");
-            return;
-        }
-
-        // Ensure the referenced promotion exists in the database
-        MongoCollection<Document> promotionCollection = database.getCollection("promotions");
-        Document promotionDoc = promotionCollection.find(eq("name", promotionInstance.getPromotionRef().getName())).first();
-        if (promotionDoc == null) {
-            System.out.println("Error: The referenced promotion does not exist.");
-            return;
-        }
-
-        Document doc = new Document("instanceID", promotionInstance.getInstanceID())
-                .append("promotionName", promotionInstance.getPromotionRef().getName())
-                .append("startDate", promotionInstance.getStartDate())
-                .append("endDate", promotionInstance.getEndDate());
-
-        collection.insertOne(doc);
-        System.out.println("Promotion instance added with ID: " + promotionInstance.getInstanceID());
     }
 }
