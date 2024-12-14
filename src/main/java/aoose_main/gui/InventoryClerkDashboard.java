@@ -3,17 +3,20 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package aoose_main.gui;
+import aoose_main.InventoryDAO;
+import aoose_main.entities.actors.InventoryClerk;
+import aoose_main.entities.others.Order;
+import aoose_main.enums.OrderStatus;
+import aoose_main.remotePattern.InventoryDTO;
+import com.mongodb.client.MongoDatabase;
+import javax.swing.*;
+import java.util.List;
 
-/**
- *
- * @author Abdo Nader
- */
 public class InventoryClerkDashboard extends javax.swing.JPanel {
+    private MongoDatabase database;
 
-    /**
-     * Creates new form InventoryClerkDashboard
-     */
-    public InventoryClerkDashboard() {
+    public InventoryClerkDashboard(MongoDatabase database, int loggedInClerkId) {
+        this.database = database;
         initComponents();
     }
 
@@ -26,19 +29,158 @@ public class InventoryClerkDashboard extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabel1 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jList1 = new javax.swing.JList<>();
+        jTextField1 = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+
+        jLabel1.setText("inventory clerk dashboard");
+
+        jScrollPane1.setViewportView(jList1);
+
+        jLabel2.setText("order id");
+
+        jButton1.setText("reject order");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText("view orders");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jButton3.setText("accept order");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(132, 132, 132)
+                        .addComponent(jLabel1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 358, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel2)
+                                        .addGap(101, 101, 101)
+                                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(27, 27, 27))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jButton1)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jButton2)
+                                        .addGap(35, 35, 35)))
+                                .addComponent(jButton3)))))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 48, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(jButton2)
+                    .addComponent(jButton3))
+                .addGap(25, 25, 25))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+try {
+        // Get the order ID from the text field
+        int orderId = Integer.parseInt(jTextField1.getText().trim());
+
+        // Initialize InventoryDAO and in-memory inventory list
+        InventoryDAO inventoryDAO = new InventoryDAO(database); // Pass MongoDB instance to the DAO
+        List<InventoryDTO> inventoryList = inventoryDAO.getAllItems();
+
+        // Create an InventoryClerk object (Replace with actual logged-in clerk details)
+        InventoryClerk inventoryClerk = new InventoryClerk(1, "John Doe", "clerk@example.com", "password123", 1234567890L, 3000, "Warehouse");
+
+        // Call the approveOrder method
+        inventoryClerk.approveOrder(orderId, inventoryList, inventoryDAO);
+
+        JOptionPane.showMessageDialog(this, "Order accepted, and items added to inventory!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Invalid Order ID. Please enter a numeric value.", "Error", JOptionPane.ERROR_MESSAGE);
+    } catch (Exception e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "An error occurred while accepting the order.", "Error", JOptionPane.ERROR_MESSAGE);
+    }    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+try {
+            int orderId = Integer.parseInt(jTextField1.getText().trim());
+            Order order = Order.loadFromDatabase(orderId);
+            if (order != null && order.getStatus() == OrderStatus.Pending) {
+                order.setStatus(OrderStatus.Rejected);
+                order.saveToDatabase();
+                JOptionPane.showMessageDialog(this, "Order Rejected Successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Order not found or not in Pending status.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "An error occurred while rejecting the order.", "Error", JOptionPane.ERROR_MESSAGE);
+        }    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+ try {
+            DefaultListModel<String> model = new DefaultListModel<>();
+            List<Order> orders = Order.loadAllOrders(database);
+
+            for (Order order : orders) {
+                model.addElement("Order ID: " + order.getOrderID() + ", Status: " + order.getStatus());
+            }
+
+            if (orders.isEmpty()) {
+                model.addElement("No orders found.");
+            }
+
+            jList1.setModel(model);
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "An error occurred while fetching orders.", "Error", JOptionPane.ERROR_MESSAGE);
+        }    }//GEN-LAST:event_jButton2ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JList<String> jList1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }

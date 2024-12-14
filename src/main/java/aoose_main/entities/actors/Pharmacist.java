@@ -1,6 +1,13 @@
 package aoose_main.entities.actors;
 
+import aoose_main.entities.abstraction.Item;
+import aoose_main.entities.others.Appointment;
 import aoose_main.enums.Shifts;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+
+import static com.mongodb.client.model.Filters.eq;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +29,7 @@ public class Pharmacist extends User {
         this.specialization = specialization;
     }
 
-    // setters for getters
-
+    // Setters and getters
     public void setLicenseNumber(String licenseNumber) {
         this.licenseNumber = licenseNumber;
     }
@@ -65,15 +71,58 @@ public class Pharmacist extends User {
         System.out.println("Scheduling an appointment...");
     }
 
-    public List<String> generateItemsList() {
-        System.out.println("Generating items list...");
-        List<String> items = new ArrayList<>(); // Placeholder
-        items.add("Paracetamol");
-        items.add("Ibuprofen");
-        return items;
-    }
-
     public void notifyInventoryClerk() {
         System.out.println("Notifying inventory clerk...");
+    }
+
+
+    public void addAppointmentForPatient(long patientID, String appointmentInformation, MongoDatabase database) {
+        try {
+            // Generate a unique appointment ID
+            long appointmentID = System.currentTimeMillis(); // Unique based on timestamp
+
+            // Create the appointment
+            Appointment appointment = new Appointment(appointmentID, appointmentInformation, patientID, this.getId());
+
+            // Save the appointment to the database
+            appointment.saveToDatabase(database);
+
+            System.out.println("Appointment successfully created for Patient ID: " + patientID);
+        } catch (Exception e) {
+            System.err.println("Error creating appointment: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
+    public Item searchItemById(long itemID, MongoDatabase database) {
+        try {
+            // Get the "items" collection from the database
+            MongoCollection<Document> collection = database.getCollection("items");
+
+            // Query the database for an item with the specified ID
+            Document itemDoc = collection.find(eq("itemID", itemID)).first();
+
+            if (itemDoc != null) {
+                // Convert the document to an Item object
+                Item item = new Item(
+                        itemDoc.getLong("itemID"),
+                        itemDoc.getString("name"),
+                        itemDoc.getString("category"),
+                        itemDoc.getDouble("price"),
+                        itemDoc.getString("description"),
+                        itemDoc.getInteger("quantity")
+                );
+                System.out.println("Item found: " + item.getName());
+                return item;
+            } else {
+                System.out.println("No item found with ID: " + itemID);
+                return null;
+            }
+        } catch (Exception e) {
+            System.err.println("Error searching for item: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
 }

@@ -4,6 +4,8 @@
  */
 package aoose_main.gui;
 
+import aoose_main.entities.actors.Pharmacist;
+import aoose_main.enums.Shifts;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import static com.mongodb.client.model.Filters.eq;
@@ -66,8 +68,6 @@ public login(MongoDatabase database, JFrame parentFrame) {
 
         jLabel3.setText("password");
 
-        jPasswordField1.setText("jPasswordField1");
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -92,8 +92,8 @@ public login(MongoDatabase database, JFrame parentFrame) {
                             .addComponent(jLabel3))
                         .addGap(39, 39, 39)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jTextField1)
-                            .addComponent(jPasswordField1, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE))))
+                            .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
+                            .addComponent(jPasswordField1))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -165,22 +165,16 @@ frame.setVisible(true);
 
     }
 
-    case "Pharmacist" -> {
-        System.out.println("Opening Pharmacist Dashboard...");
-        JFrame dashboardFrame = new JFrame("Pharmacist Dashboard");
-        dashboardFrame.setContentPane(new PharmacistDashboard());
-        dashboardFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        dashboardFrame.pack();
-        dashboardFrame.setVisible(true);
-    }
-    case "Inventory Clerk" -> {
-        System.out.println("Opening Inventory Clerk Dashboard...");
-        JFrame dashboardFrame = new JFrame("Inventory Clerk Dashboard");
-        dashboardFrame.setContentPane(new InventoryClerkDashboard());
-        dashboardFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        dashboardFrame.pack();
-        dashboardFrame.setVisible(true);
-    }
+case "Pharmacist" -> {
+    System.out.println("Opening Pharmacist Dashboard...");
+    int pharmacistID = user.getInteger("id");
+
+    JFrame dashboardFrame = new JFrame("Pharmacist Dashboard");
+    dashboardFrame.setContentPane(new PharmacistDashboard(database, pharmacistID)); // Pass only the ID
+    dashboardFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    dashboardFrame.pack();
+    dashboardFrame.setVisible(true);
+}
 case "Supplier" -> {
     System.out.println("Opening Supplier Dashboard...");
     JFrame dashboardFrame = new JFrame("Supplier Dashboard");
