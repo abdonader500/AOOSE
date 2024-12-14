@@ -2,7 +2,9 @@ package aoose_main.entities.actors;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.time.LocalDateTime;
+import aoose_main.entities.others.Feedback;
+import com.mongodb.client.MongoDatabase;
 import aoose_main.InventoryDAO;
 import aoose_main.entities.abstraction.Item;
 import aoose_main.entities.others.Order;
@@ -45,7 +47,11 @@ public class InventoryClerk extends User {
         }
         return order;
     }
-
+    public void writeFeedback(int feedbackId, int supplierID, String message, MongoDatabase database) {
+        Feedback feedback = new Feedback(feedbackId, supplierID, message, LocalDateTime.now());
+        feedback.saveToDatabase(database);
+        System.out.println("Feedback written by Inventory Clerk with ID: " + this.getId());
+    }
     // Approve an order and add items to inventory
     // Approve an order and add items to inventory
     public void approveOrder(int orderId, List<InventoryDTO> inventory, InventoryDAO inventoryDAO) {
