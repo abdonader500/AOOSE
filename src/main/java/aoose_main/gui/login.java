@@ -47,7 +47,7 @@ public login(MongoDatabase database, JFrame parentFrame) {
         jLabel3 = new javax.swing.JLabel();
         jPasswordField1 = new javax.swing.JPasswordField();
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Patient", "Inventory Clerk", "Insurance Provider", "Supplier", "Pharmacist", "Admin" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Patient", "Inventory Clerk", "Insurance Provider", "Supplier", "Cashier", "Pharmacist", "Admin" }));
 
         jLabel1.setText("login page");
 
@@ -171,6 +171,16 @@ case "Pharmacist" -> {
 
     JFrame dashboardFrame = new JFrame("Pharmacist Dashboard");
     dashboardFrame.setContentPane(new PharmacistDashboard(database, pharmacistID)); // Pass only the ID
+    dashboardFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    dashboardFrame.pack();
+    dashboardFrame.setVisible(true);
+}
+case "Cashier" -> {
+    System.out.println("Opening Cashier Dashboard...");
+    int cashierID = user.getInteger("id");
+
+    JFrame dashboardFrame = new JFrame("Cashier Dashboard");
+    dashboardFrame.setContentPane(new CashierDashboard(database, cashierID)); // Pass only the ID
     dashboardFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     dashboardFrame.pack();
     dashboardFrame.setVisible(true);
