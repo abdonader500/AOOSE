@@ -10,23 +10,15 @@ import java.util.List;
 public class Insurance {
     private long insuranceProviderID; // ID of the associated insurance provider
     private long insuranceID; // Unique ID for the insurance policy
-    private List<Insurance> insuranceTier; // List representing the insurance tier structure
     private int insurancePercentage; // Percentage of coverage by the insurance
     private long patientID; // ID of the patient who has this insurance
 
     // Constructor
-    public Insurance(long insuranceProviderID, long insuranceID, List<Insurance> insuranceTier,
-                     int insurancePercentage, long patientID) {
+    public Insurance(long insuranceProviderID, long insuranceID,int insurancePercentage, long patientID) {
         this.insuranceProviderID = insuranceProviderID;
         this.insuranceID = insuranceID;
-        this.insuranceTier = (insuranceTier != null) ? new ArrayList<>(insuranceTier) : new ArrayList<>();
         this.insurancePercentage = insurancePercentage;
         this.patientID = patientID;
-    }
-
-    // Overloaded Constructor (for simpler creation)
-    public Insurance(long insuranceProviderID, long insuranceID, int insurancePercentage, long patientID) {
-        this(insuranceProviderID, insuranceID, null, insurancePercentage, patientID);
     }
 
     // Method to create an Insurance object from a MongoDB Document
@@ -57,16 +49,8 @@ public class Insurance {
                     : insuranceDoc.getLong("patientID");
         }
 
-        // Recreate insurance tiers if they exist
-        List<Document> tierDocs = insuranceDoc.getList("insuranceTier", Document.class);
-        List<Insurance> insuranceTier = new ArrayList<>();
-        if (tierDocs != null) {
-            for (Document tierDoc : tierDocs) {
-                insuranceTier.add(Insurance.fromDocument(tierDoc));
-            }
-        }
 
-        return new Insurance(insuranceProviderID, insuranceID, insuranceTier, insurancePercentage, patientID);
+        return new Insurance(insuranceProviderID, insuranceID, insurancePercentage, patientID);
     }
 
 
@@ -80,15 +64,6 @@ public class Insurance {
                 .append("insuranceID", insuranceID)
                 .append("insurancePercentage", insurancePercentage)
                 .append("patientID", patientID);
-
-        // Convert insurance tiers to documents if they exist
-        if (insuranceTier != null && !insuranceTier.isEmpty()) {
-            List<Document> tierDocs = new ArrayList<>();
-            for (Insurance tier : insuranceTier) {
-                tierDocs.add(tier.toDocument());
-            }
-            doc.append("insuranceTier", tierDocs);
-        }
 
         return doc;
     }
@@ -119,14 +94,6 @@ public class Insurance {
 
     public void setInsuranceID(long insuranceID) {
         this.insuranceID = insuranceID;
-    }
-
-    public List<Insurance> getInsuranceTier() {
-        return (insuranceTier != null) ? new ArrayList<>(insuranceTier) : new ArrayList<>();
-    }
-
-    public void setInsuranceTier(List<Insurance> insuranceTier) {
-        this.insuranceTier = (insuranceTier != null) ? new ArrayList<>(insuranceTier) : new ArrayList<>();
     }
 
     public int getInsurancePercentage() {
@@ -162,13 +129,5 @@ public class Insurance {
         System.out.println("Provider ID: " + insuranceProviderID);
         System.out.println("Patient ID: " + patientID);
         System.out.println("Insurance Coverage Percentage: " + insurancePercentage + "%");
-        if (insuranceTier != null && !insuranceTier.isEmpty()) {
-            System.out.println("Insurance Tier Details:");
-            for (Insurance tier : insuranceTier) {
-                System.out.println("- Tier Insurance ID: " + tier.getInsuranceID());
-            }
-        } else {
-            System.out.println("No insurance tiers available.");
-        }
     }
 }

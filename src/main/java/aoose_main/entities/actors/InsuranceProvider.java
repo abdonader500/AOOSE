@@ -69,11 +69,10 @@ public class InsuranceProvider extends User {
 
     // Methods to Manage Insurance Policies
 
-    public void addInsurancePolicy(int insuranceID, int insuranceProviderID, int insurancePercentage, List<Integer> tierIDs) {
+    public void addInsurancePolicy(int insuranceID, int insuranceProviderID, int insurancePercentage) {
         Document doc = new Document("insuranceID", insuranceID)
                 .append("insuranceProviderID", insuranceProviderID)
-                .append("insurancePercentage", insurancePercentage)
-                .append("tierIDs", tierIDs);
+                .append("insurancePercentage", insurancePercentage);
 
         if (insuranceCollection.find(eq("insuranceID", insuranceID)).first() == null) {
             insuranceCollection.insertOne(doc);

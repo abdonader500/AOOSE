@@ -58,8 +58,7 @@ public class testInsuranceCycle {
         int insuranceID = 501;
         int insuranceProviderID = insuranceProvider.getId();
         int insurancePercentage = 90; // Coverage percentage
-        List<Integer> insuranceTier = new ArrayList<>();
-        insuranceProvider.addInsurancePolicy(insuranceID, insuranceProviderID, insurancePercentage, insuranceTier);
+        insuranceProvider.addInsurancePolicy(insuranceID, insuranceProviderID, insurancePercentage);
 
         // Verify that the insurance policy was added successfully
         List<Document> policies = insuranceProvider.viewAllInsurancePolicies();
@@ -67,7 +66,7 @@ public class testInsuranceCycle {
         assertEquals(501, policies.get(0).getInteger("insuranceID"), "Insurance ID should match");
 
         // Step 3: Admin creates a Patient and associates the newly created insurance
-        Insurance patientInsurance = new Insurance(insuranceProviderID, insuranceID, new ArrayList<>(), insurancePercentage, 601); // Patient ID: 601
+        Insurance patientInsurance = new Insurance(insuranceProviderID, insuranceID, insurancePercentage, 601); // Patient ID: 601
         Patient patient = new Patient(
                 601,
                 "Alice Green",
