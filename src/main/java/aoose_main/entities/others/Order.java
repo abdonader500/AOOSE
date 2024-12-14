@@ -61,6 +61,42 @@ public class Order {
             return null;
         }
     }
+    public static List<Order> loadAllOrders(MongoDatabase database) {
+        List<Order> orders = new ArrayList<>();
+        try {
+            // Ensure the orders collection is initialized
+            if (ordersCollection == null) {
+                ordersCollection = database.getCollection("orders");
+            }
+
+            // Query all documents in the orders collection
+            for (Document doc : ordersCollection.find()) {
+                // Create an Order object from the document
+                Order order = new Order(doc.getInteger("orderID"), OrderStatus.valueOf(doc.getString("status")));
+
+                // Load items associated with the order
+                List<Document> itemsDocs = (List<Document>) doc.get("items");
+                if (itemsDocs != null) {
+                    for (Document itemDoc : itemsDocs) {
+                        Item item = new Item(
+                                itemDoc.getLong("itemID"),
+                                itemDoc.getString("name"),
+                                itemDoc.getString("category"),
+                                itemDoc.getDouble("price"),
+                                itemDoc.getString("description"),
+                                itemDoc.getInteger("quantity")
+                        );
+                        order.getItems().add(item);
+                    }
+                }
+                orders.add(order);
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading orders from database: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return orders;
+    }
 
     // Save the order to the database
     public void saveToDatabase() {

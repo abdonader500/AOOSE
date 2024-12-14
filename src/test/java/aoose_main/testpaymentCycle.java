@@ -61,7 +61,7 @@ public class testpaymentCycle {
         // Step 2: Insurance provider creates insurance
         System.out.println("--- Step 2: Insurance provider creates insurance ---");
         List<Integer> tierIDs = Arrays.asList(101, 102); // Example tiers
-        insuranceProvider.addInsurancePolicy(1, insuranceProvider.getId(), 20, tierIDs);
+        insuranceProvider.addInsurancePolicy(1, insuranceProvider.getId(), 20);
 
         // Verify insurance policy is added to the database
         Document insuranceDoc = database.getCollection("insurances").find(eq("insuranceID", 1)).first();
